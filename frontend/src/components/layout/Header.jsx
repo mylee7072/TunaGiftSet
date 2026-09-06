@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { siteConfig } from "../../config/siteConfig";
 import { fetchProductCategories } from "../../data/products";
@@ -16,7 +16,14 @@ export function Header() {
   const [cartCount, setCartCount] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [categories, setCategories] = useState([]);
-  const { shouldRender: drawerMounted, closing: drawerClosing } = useDismissibleOverlay(menuOpen, () => setMenuOpen(false));
+  const drawerRef = useRef(null);
+  const { shouldRender: drawerMounted, closing: drawerClosing } = useDismissibleOverlay(menuOpen, () => setMenuOpen(false), drawerRef);
+
+  useEffect(() => {
+    if (menuOpen) {
+      drawerRef.current?.querySelector("a, button")?.focus();
+    }
+  }, [menuOpen]);
 
   useEffect(() => {
     setKeyword(searchParams.get("keyword") || "");
@@ -162,7 +169,7 @@ export function Header() {
 
       {drawerMounted && <div className={`nav-backdrop${drawerClosing ? " nav-backdrop--closing" : ""}`} onClick={() => setMenuOpen(false)} />}
 
-      <nav className={`site-header__gnb${menuOpen ? " site-header__gnb--open" : ""}`} aria-label="카테고리" {...navInert}>
+      <nav ref={drawerRef} className={`site-header__gnb${menuOpen ? " site-header__gnb--open" : ""}`} aria-label="카테고리" {...navInert}>
         <div className="container site-header__gnb-inner">
           <NavLink to="/products" onClick={() => setMenuOpen(false)} className={({ isActive }) => (isActive && !searchParams.get("categoryId") ? "is-active" : "")}>
             전체상품

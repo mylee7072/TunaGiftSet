@@ -1,22 +1,76 @@
 :root {
-  /* Clean white base: near-black text/buttons on white, with color reserved for
+  /* ---------- Color ----------
+   * Clean white base: near-black text/buttons on white, with color reserved for
    * genuinely semantic accents (sale price, warning, success) rather than tinting
-   * every surface — see the "design pass 2" :root override further down, which
-   * carries the same neutral values so the two blocks agree. */
+   * every surface. Point color stays the dark navy/charcoal family already in use
+   * — not a new brand blue. */
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-alt: #fafafa;
+  --color-border: #e5e5e5;
+  --color-text: #18181b;
+  --color-text-muted: #6b7280;
   --color-primary: #1f2937;
   --color-primary-dark: #111827;
   --color-accent: #c0392b;
-  --color-text: #18181b;
-  --color-text-muted: #6b7280;
-  --color-border: #e5e5e5;
-  --color-surface: #ffffff;
-  --color-surface-alt: #fafafa;
   --color-danger: #c0392b;
+  /* Darkened from the 1차 값 (#b7791f) — white text on that background measured
+   * 3.64:1, below WCAG AA's 4.5:1 for normal text. This value gets ~5.2:1. */
+  --color-warning: #a15c00;
   --color-success: #2e7d32;
-  --container-width: 1120px;
+
+  /* ---------- Spacing scale (4px unit) ----------
+   * Reach for these instead of one-off px values — a new gap/padding should be
+   * one of these, not a number that happens to look right. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ---------- Typography ----------
+   * Pretendard loaded in index.html (see the <link> there); this stack is just
+   * the fallback chain for the moment before/if that load fails. */
+  --font-sans: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", -apple-system,
+    BlinkMacSystemFont, sans-serif;
+  --font-size-xs: 0.75rem;   /* 12px — fine print, meta */
+  --font-size-sm: 0.875rem;  /* 14px — labels, secondary text */
+  --font-size-base: 1rem;    /* 16px — body */
+  --font-size-md: 1.125rem;  /* 18px — emphasized body, card price */
+  --font-size-lg: 1.25rem;   /* 20px — section titles */
+  --font-size-xl: 1.5rem;    /* 24px — page titles */
+  --font-size-2xl: 1.875rem; /* 30px */
+  --font-size-3xl: 2.25rem;  /* 36px */
+  --font-size-4xl: 2.75rem;  /* 44px — hero, desktop only via clamp() */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.65;
+  --tracking-tight: -0.02em; /* large headings only — keeps big type from looking loose */
+  --tracking-normal: 0;
+
+  /* ---------- Radius & shadow ----------
+   * Three tiers each, on purpose — a fourth "just this once" size is a sign the
+   * surface should reuse one of these instead. --radius-full is the one deliberate
+   * exception, reserved for capsule shapes (pills, chips), not a rounding choice. */
   --radius-sm: 4px;
   --radius-md: 8px;
-  --font-sans: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+  --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 14px 34px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 22px 48px rgba(0, 0, 0, 0.12);
+
+  /* ---------- Layout ----------
+   * Breakpoints (640/768/1024/1280) aren't tokens — custom properties can't be
+   * used inside @media conditions — so they're just used literally at each
+   * @media boundary and documented here for reference. */
+  --container-max: 1200px;
+  --container-padding-mobile: var(--space-4);
+  --container-padding-desktop: var(--space-6);
+  --touch-target-min: 44px;
 
   /* ---------- Motion tokens ----------
    * Every transition/animation in this file should reference one of these rather
@@ -40,6 +94,9 @@
   --z-toast: 100;
   --z-modal-backdrop: 200;
   --z-modal: 201;
+
+  /* Back-compat alias — most of the stylesheet still writes --container-width. */
+  --container-width: var(--container-max);
 }
 
 * {
@@ -80,6 +137,25 @@
   border-radius: var(--radius-sm);
 }
 
+/* Off-screen until focused — the very first Tab stop on any page, so keyboard
+ * users can jump past the header/nav straight to the page content. */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--space-4);
+  z-index: var(--z-modal);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  transition: top var(--motion-fast) var(--ease-standard);
+}
+
+.skip-link:focus {
+  top: var(--space-4);
+}
+
 html,
 body {
   padding: 0;
@@ -96,8 +172,10 @@ html {
 body {
   font-family: var(--font-sans);
   color: var(--color-text);
-  background: var(--color-surface-alt);
-  line-height: 1.5;
+  background: var(--color-bg);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--tracking-normal);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -127,23 +205,33 @@ textarea {
 }
 
 .container {
-  max-width: var(--container-width);
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 var(--container-padding-mobile);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--container-padding-desktop);
+  }
 }
 
 .section {
-  padding: 32px 0;
+  padding: var(--space-8) 0;
 }
 
 .section__title {
-  font-size: 1.25rem;
-  margin: 0 0 16px;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  margin: 0 0 var(--space-4);
 }
 
 .page-title {
-  font-size: 1.5rem;
-  margin: 0 0 20px;
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  letter-spacing: var(--tracking-tight);
+  margin: 0 0 var(--space-3);
 }
 
 .page-header,
@@ -215,6 +303,10 @@ textarea {
   background: var(--color-primary-dark);
 }
 
+.btn--primary:active:not(:disabled) {
+  background: #0b0f19;
+}
+
 .btn--secondary {
   background: var(--color-surface);
   border-color: var(--color-border);
@@ -226,6 +318,10 @@ textarea {
   border-color: var(--color-primary);
 }
 
+.btn--secondary:active:not(:disabled) {
+  background: #f0f0f0;
+}
+
 .btn--danger {
   background: var(--color-danger);
   color: #fff;
@@ -233,6 +329,10 @@ textarea {
 
 .btn--danger:hover:not(:disabled) {
   opacity: 0.85;
+}
+
+.btn--danger:active:not(:disabled) {
+  opacity: 0.7;
 }
 
 .btn--block {
@@ -452,7 +552,7 @@ textarea {
   animation: modal-backdrop-out var(--motion-fast) var(--ease-exit) forwards;
 }
 
-@media (min-width: 721px) {
+@media (min-width: 768px) {
   .nav-backdrop {
     display: none !important;
   }
@@ -463,63 +563,99 @@ textarea {
   background: var(--color-surface-alt);
   border-top: 1px solid var(--color-border);
   color: var(--color-text);
-  margin-top: 40px;
+  margin-top: var(--space-12);
 }
 
+/* Grid groups the existing DOM order into clear columns on tablet+ (brand / links
+ * / info side by side, business info and copyright each spanning full width
+ * below) — pure layout, the JSX children and their order are untouched. */
 .site-footer__inner {
-  padding: 28px 20px;
-  font-size: 0.85rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  padding: var(--space-8) 0 var(--space-6);
+  font-size: var(--font-size-sm);
 }
 
-.site-footer__disclaimer {
-  max-width: 720px;
-  color: var(--color-text-muted);
+@media (min-width: 768px) {
+  .site-footer__inner {
+    grid-template-columns: 1.4fr 1fr 1fr;
+    column-gap: var(--space-8);
+    row-gap: var(--space-6);
+  }
+
+  .site-footer__business {
+    grid-column: 1 / -1;
+  }
+
+  .site-footer__copyright {
+    grid-column: 1 / -1;
+  }
+}
+
+.site-footer__brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.site-footer__brand strong {
+  font-size: var(--font-size-md);
+  font-weight: 800;
 }
 
 .site-footer__links {
   display: flex;
-  gap: 16px;
-  margin: 14px 0;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
   color: var(--color-text-muted);
 }
 
 .site-footer__info {
   display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin: 14px 0;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
 }
 
 .site-footer__info dt {
   color: var(--color-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
+  margin-bottom: 2px;
+}
+
+.site-footer__info dd {
+  margin: 0;
+  font-weight: 600;
 }
 
 .site-footer__business {
   max-width: 480px;
-  margin: 14px 0;
-  padding: 14px 16px;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
 }
 
 .site-footer__business-toggle {
-  font-size: 0.85rem;
+  min-height: var(--touch-target-min);
+  font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--color-text);
 }
 
 .site-footer__business-table {
   display: grid;
-  gap: 6px;
-  margin: 14px 0;
-  font-size: 0.82rem;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+  font-size: var(--font-size-sm);
 }
 
 .site-footer__business-table div {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .site-footer__business-table dt {
@@ -534,8 +670,10 @@ textarea {
 }
 
 .site-footer__copyright {
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
   color: var(--color-text-muted);
-  margin-top: 14px;
+  margin: 0;
 }
 
 .company-info-page__table {
@@ -651,10 +789,26 @@ textarea {
 }
 
 /* ---------- Product grid / card ---------- */
+/* Mobile-first: 2 columns by default, 3 from tablet (768px), 4 from desktop
+ * (1024px) — see the shared breakpoint scale documented on :root. */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+  }
+}
+
+@media (min-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-6);
+  }
 }
 
 .product-card {
@@ -746,22 +900,48 @@ textarea {
   z-index: 2;
 }
 
+/* Plain inline chip by default — used both as an image overlay (product cards,
+ * positioned absolute below) and as an inline status chip (product detail meta
+ * row, review/Q&A list). It was position:absolute unconditionally before, which
+ * put every inline usage at the nearest positioned ancestor's corner instead of
+ * in flow with its siblings. */
 .badge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  font-size: 0.7rem;
-  padding: 3px 8px;
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 3px var(--space-2);
   border-radius: var(--radius-sm);
   color: #fff;
+}
+
+.product-card__image-wrap .badge {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
 }
 
 .badge--soldout {
   background: #737373;
 }
 
+/* Gold, not the navy point color — reads as an editorial "worth noting" pick
+ * rather than a status label, and stays visually distinct from the red discount
+ * badge on the price line below. */
 .badge--featured {
-  background: var(--color-primary);
+  background: var(--color-warning);
+}
+
+/* Previously undefined — question/review status chips (badge--success on
+ * "답변완료", badge--muted on "답변대기"/"비밀글"/"구매확인") fell back to the base
+ * .badge's white text with no background, i.e. invisible on a white page. */
+.badge--success {
+  background: var(--color-success);
+}
+
+.badge--muted {
+  background: var(--color-text-muted);
 }
 
 .product-card__body {
@@ -819,10 +999,11 @@ textarea {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 60px 20px;
+  gap: var(--space-3);
+  padding: var(--space-16) var(--space-4);
   text-align: center;
   color: var(--color-text-muted);
+  font-size: var(--font-size-md);
 }
 
 .state-block--error {
@@ -934,26 +1115,29 @@ textarea {
 .admin-form {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .auth-form label,
 .order-form label,
 .address-form label,
 .admin-form label {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  margin-top: 8px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-top: var(--space-2);
 }
 
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .form-field label {
-  margin-top: 8px;
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
 }
 
 .auth-form input,
@@ -963,16 +1147,26 @@ textarea {
 .admin-form input,
 .admin-form select,
 .admin-form textarea {
-  padding: 10px 12px;
+  min-height: var(--touch-target-min);
+  padding: 0 var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
   font-family: inherit;
+  font-size: var(--font-size-base);
+  transition: border-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard);
 }
 
+.admin-form textarea {
+  min-height: 96px;
+  padding: var(--space-3);
+}
+
+/* Tone-down: a slim ring instead of the previous heavier, mismatched-red glow —
+ * still unambiguous at a glance, just not shouting. */
 .auth-form input.is-invalid {
   border-color: var(--color-danger);
-  box-shadow: 0 0 0 3px rgba(190, 24, 24, 0.12);
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
 }
 
 .auth-form input.is-invalid:focus {
@@ -981,252 +1175,55 @@ textarea {
 
 .auth-form button,
 .order-form-page button[type="submit"] {
-  margin-top: 20px;
+  margin-top: var(--space-4);
 }
 
 .auth-page__footer {
-  margin-top: 16px;
-  font-size: 0.9rem;
+  margin-top: var(--space-4);
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
 
 .form-error {
   color: var(--color-danger);
-  font-size: 0.85rem;
-  margin: 4px 0 0;
+  font-size: var(--font-size-sm);
+  margin: var(--space-1) 0 0;
 }
 
 .form-field__error {
   color: var(--color-danger);
-  font-size: 0.8rem;
+  font-size: var(--font-size-xs);
   line-height: 1.45;
   margin: -1px 0 0;
 }
 
 .auth-form__server-error {
-  padding: 12px 14px;
-  border: 1px solid rgba(190, 24, 24, 0.28);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid rgba(192, 57, 43, 0.22);
   border-radius: var(--radius-sm);
-  background: rgba(254, 242, 242, 0.9);
+  background: rgba(192, 57, 43, 0.05);
   color: var(--color-danger);
-  font-size: 0.88rem;
+  font-size: var(--font-size-sm);
   line-height: 1.45;
 }
 
 .form-hint {
   color: var(--color-text-muted);
-  font-size: 0.78rem;
-  margin: 2px 0 0;
+  font-size: var(--font-size-xs);
+  margin: var(--space-1) 0 0;
 }
 
-/* ---------- Product detail ---------- */
-.product-detail {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-}
-
-.product-detail__main-image {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface-alt);
-  /* Re-keyed by activeImageIndex in ProductDetailPage.jsx, so every thumbnail
-   * switch remounts this <img> and replays the fade — a plain cross-fade rather
-   * than sliding, since the two images aren't necessarily the same aspect. */
-  animation: gallery-fade-in var(--motion-normal) var(--ease-standard);
-}
-
-@keyframes gallery-fade-in {
-  from {
-    opacity: 0.2;
-  }
-}
-
-.product-detail__thumbnails {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.product-detail__thumbnail {
-  width: 60px;
-  height: 60px;
-  padding: 0;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background: none;
-  transition: border-color var(--motion-fast) var(--ease-standard);
-}
-
-.product-detail__thumbnail:hover {
-  border-color: var(--color-primary);
-}
-
-.product-detail__thumbnail img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.product-detail__thumbnail--active {
-  border-color: var(--color-primary);
-}
-
-.product-detail__brand {
-  color: var(--color-text-muted);
-  margin: 0 0 4px;
-}
-
-.product-detail__name {
-  font-size: 1.4rem;
-  margin: 0 0 8px;
-}
-
-.product-detail__meta {
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
-  margin: 0 0 16px;
-}
-
-.product-detail__price {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.product-detail__original-price {
-  text-decoration: line-through;
-  color: var(--color-text-muted);
-}
-
-.product-detail__sale-price {
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.product-detail__soldout {
-  color: var(--color-danger);
-  font-weight: 600;
-}
-
-.product-detail__total {
-  margin: 12px 0;
-  font-weight: 600;
-}
-
-.product-detail__actions {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-
-.product-detail__actions .btn {
-  flex: 1;
-}
-
-.product-detail__description {
-  border-top: 1px solid var(--color-border);
-  padding-top: 16px;
-  white-space: pre-wrap;
-}
-
-.product-detail__rating {
-  margin: 0 0 14px;
-  color: var(--color-primary-dark);
-  font-weight: 700;
-}
-
-.product-detail__wishlist {
-  margin: -4px 0 16px;
-}
-
-/* ---------- Review / Q&A ---------- */
-.community-section {
-  margin-top: 28px;
-  padding: 20px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-}
-
-.community-section h2 {
-  margin: 0 0 12px;
-  font-size: 1.2rem;
-}
-
+/* ---------- Review / Q&A ----------
+ * The old BEM-style product-detail-gallery/info/price rules (double underscore
+ * naming) and the community-section/community-list/community-item/community-form
+ * rules that used to live here were removed as dead CSS — ProductDetailPage.jsx
+ * was rewritten to the hyphenated product-detail- and detail-community- classes
+ * below and never used these names. community-item__collapsible and __toggle
+ * further down are kept — Footer.jsx's business-info accordion still uses them. */
 .review-summary {
   margin-bottom: 16px;
   color: var(--color-primary-dark);
   font-weight: 700;
-}
-
-.community-list {
-  list-style: none;
-  margin: 0 0 18px;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.community-item {
-  padding: 14px 0;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.community-item__header {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
-}
-
-.community-item h3 {
-  margin: 8px 0 6px;
-  font-size: 1rem;
-}
-
-.community-item p {
-  white-space: pre-wrap;
-}
-
-.community-form {
-  display: grid;
-  gap: 8px;
-  padding-top: 12px;
-}
-
-.community-form h3 {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.community-form input,
-.community-form select,
-.community-form textarea {
-  padding: 10px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-}
-
-.community-form textarea {
-  min-height: 110px;
-  resize: vertical;
-}
-
-.community-form__checkbox {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .question-answer {
@@ -1235,36 +1232,6 @@ textarea {
   background: var(--color-surface-alt);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-}
-
-.star-rating-input {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.star-rating-input__star {
-  background: none;
-  border: none;
-  padding: 2px;
-  font-size: 1.5rem;
-  line-height: 1;
-  color: var(--color-border);
-  transition: transform var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard);
-}
-
-.star-rating-input__star.is-filled {
-  color: #e0a83e;
-}
-
-.star-rating-input__star:hover {
-  transform: scale(1.12);
-}
-
-.star-rating-input__value {
-  margin-left: 6px;
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
 }
 
 /* Collapsible Q&A item — see .community-item--question in ProductDetailPage.jsx.
@@ -1485,11 +1452,6 @@ textarea {
   border-top: 1px solid var(--color-border);
   padding-top: 10px;
   margin-top: 6px;
-}
-
-.order-summary__note {
-  color: var(--color-text-muted);
-  font-size: 0.8rem;
 }
 
 .order-form-page__coupon-selected {
@@ -2423,12 +2385,9 @@ textarea {
   flex-wrap: wrap;
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 1024px) {
-  .product-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+/* ---------- Responsive ----------
+ * .product-grid's own column-count breakpoints live with its base rule near the
+ * top of this file (mobile-first, min-width 768/1024) — not repeated here. */
 
 @media (max-width: 860px) {
   .product-detail {
@@ -2492,12 +2451,7 @@ textarea {
   }
 }
 
-@media (max-width: 720px) {
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-
+@media (max-width: 767px) {
   /* Sticks to the viewport bottom once it would otherwise scroll out of view —
    * pure position:sticky (no JS/scroll listener needed) because its containing
    * block, .product-detail__info, extends well past it (the long description
@@ -2636,11 +2590,6 @@ textarea {
 }
 
 @media (max-width: 480px) {
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-
   .product-detail__actions {
     flex-direction: column;
   }
@@ -2665,40 +2614,16 @@ textarea {
 }
 
 /* ---------- Customer storefront design pass 2 ---------- */
-:root {
-  --color-primary: #1f2937;
-  --color-primary-dark: #111827;
-  --color-accent: #c0392b;
-  --color-warning: #b7791f;
-  --color-background: #ffffff;
-  --color-surface: #ffffff;
-  --color-surface-alt: #fafafa;
-  --color-border: #e5e5e5;
-  --color-text: #18181b;
-  --color-text-muted: #6b7280;
-  --container-width: 1180px;
-  --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 14px 34px rgba(0, 0, 0, 0.08);
-}
-
-body {
-  background: #ffffff;
-  letter-spacing: 0;
-}
-
-.container {
-  max-width: var(--container-width);
-}
-
 .section {
-  padding: 44px 0;
+  padding: var(--space-12) 0;
 }
 
 .page-title {
-  margin-bottom: 10px;
-  font-size: 2rem;
-  line-height: 1.25;
-  letter-spacing: 0;
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--tracking-tight);
   word-break: keep-all;
 }
 
@@ -2734,14 +2659,14 @@ body {
 }
 
 .btn {
-  min-height: 42px;
+  min-height: var(--touch-target-min);
   border-radius: var(--radius-md);
   box-shadow: none;
 }
 
 .btn--large {
   min-height: 48px;
-  padding-inline: 24px;
+  padding-inline: var(--space-6);
 }
 
 input,
@@ -2792,39 +2717,48 @@ textarea {
 }
 
 .site-header__search {
-  flex: 1 1 430px;
-  max-width: 520px;
+  flex: 1 1 380px;
+  max-width: 460px;
 }
 
 .site-header__search input {
-  height: 46px;
-  border-color: #dcdcdc;
-  background: #fff;
+  height: var(--touch-target-min);
+  padding: 0 var(--space-3);
+  border-color: var(--color-border);
+  background: var(--color-surface-alt);
+  font-size: var(--font-size-sm);
+}
+
+.site-header__search input:focus {
+  background: var(--color-surface);
 }
 
 .site-header__search button {
-  height: 46px;
-  min-width: 72px;
+  height: var(--touch-target-min);
+  min-width: 64px;
+  font-size: var(--font-size-sm);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
 }
 
 .site-header__search-clear {
-  min-width: 40px !important;
+  min-width: var(--touch-target-min) !important;
   border-left: 0;
   border-radius: 0;
-  background: #fff;
+  background: transparent;
   color: var(--color-text-muted);
 }
 
 .site-header__actions {
-  gap: 10px;
-  font-size: 0.92rem;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
 }
 
 .site-header__actions a,
 .site-header__actions .link-button {
-  min-height: 34px;
-  padding: 6px 9px;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  padding: 6px var(--space-2);
   border-radius: var(--radius-md);
 }
 
@@ -2860,39 +2794,66 @@ textarea {
 }
 
 .hero {
-  margin-top: 18px;
+  margin-top: var(--space-4);
   overflow: hidden;
-  border: 1px solid #e5e5e5;
-  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   background:
-    radial-gradient(circle at 78% 24%, rgba(192, 57, 43, 0.08), transparent 30%),
+    radial-gradient(circle at 78% 24%, rgba(192, 57, 43, 0.07), transparent 30%),
     linear-gradient(135deg, #f7f7f7 0%, #f2f2f2 100%);
   box-shadow: var(--shadow-sm);
 }
 
 .hero__inner {
   min-height: 320px;
-  padding: 42px;
+  padding: var(--space-8);
+}
+
+.hero__eyebrow {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .hero__text h1 {
   max-width: 540px;
   font-size: clamp(2rem, 4vw, 3.4rem);
+  font-weight: 800;
   line-height: 1.12;
+  letter-spacing: var(--tracking-tight);
   word-break: keep-all;
 }
 
 .hero__text p {
-  max-width: 540px;
-  color: #525252;
-  font-size: 1.05rem;
+  max-width: 480px;
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-relaxed);
   word-break: keep-all;
 }
 
+/* Frames the placeholder svg as a deliberate "product photo goes here" slot
+ * rather than a bare icon floating in space — a real photo drops straight into
+ * this same frame later with no markup change. */
+.hero__visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: min(38vw, 340px);
+  aspect-ratio: 1 / 1;
+  padding: var(--space-8);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
 .hero__image {
-  width: min(38vw, 420px);
-  max-height: 260px;
+  width: 100%;
+  max-height: 100%;
   object-fit: contain;
+  opacity: 0.85;
 }
 
 .category-quick-menu {
@@ -2931,29 +2892,31 @@ textarea {
   font-weight: 800;
 }
 
-.product-grid {
-  gap: 22px;
-}
-
 .product-card {
   overflow: hidden;
-  border-color: #e5e5e5;
+  border-color: var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   box-shadow: var(--shadow-sm);
+  transition: transform var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard);
 }
 
+/* Subtle lift, not a jump — 130ms (--motion-fast) keeps it well under the 200ms
+ * ceiling asked for, and transform+shadow together (never a size change) means
+ * neighboring cards never reflow. */
 .product-card:hover,
 .product-card:focus-visible {
   border-color: rgba(31, 41, 55, 0.45);
   box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
 }
 
 .product-card__image-wrap {
   aspect-ratio: 1 / 1;
-  padding: 14px;
-  background: #fafafa;
-  border-bottom: 1px solid #eeeeee;
+  padding: var(--space-4);
+  background: var(--color-surface-alt);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .product-card__image {
@@ -2964,42 +2927,59 @@ textarea {
 
 .product-card__body {
   min-height: 154px;
-  padding: 14px 14px 16px;
+  padding: var(--space-4) var(--space-4) var(--space-4);
 }
 
 .product-card__brand {
   min-height: 1.2em;
   color: var(--color-text-muted);
-  font-size: 0.82rem;
+  font-size: var(--font-size-xs);
 }
 
 .product-card__name {
   min-height: 2.9em;
-  margin: 5px 0 10px;
+  margin: 5px 0 var(--space-2);
   font-weight: 700;
   line-height: 1.42;
   word-break: keep-all;
   overflow-wrap: anywhere;
 }
 
+/* Composition/summary text — capped at two lines so cards with a longer blurb
+ * never grow taller than their neighbors in the same row. */
 .product-card__description {
-  margin: -4px 0 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: -4px 0 var(--space-2);
   color: var(--color-text-muted);
-  font-size: 0.86rem;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
 }
 
 .product-card__price {
   align-items: baseline;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .product-card__sale-price {
-  font-size: 1.16rem;
+  font-size: var(--font-size-md);
   font-weight: 850;
+  color: var(--color-text);
 }
 
+/* Discount rate reads as its own small badge — not just bold colored text sitting
+ * inline with the price — so it's clearly the least important of the three price
+ * signals (sale price > crossed-out original > this). */
 .product-card__discount {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: rgba(192, 57, 43, 0.1);
   color: var(--color-accent);
+  font-size: var(--font-size-xs);
   font-weight: 800;
 }
 
@@ -3086,47 +3066,8 @@ textarea {
   font-size: 0.84rem;
 }
 
-.category-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 16px 0;
-}
-
-.category-tabs__item {
-  padding: 9px 18px;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  background: var(--color-surface);
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard);
-}
-
-.category-tabs__item:hover {
-  border-color: var(--color-primary);
-  color: var(--color-text);
-}
-
-.category-tabs__item.is-active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #fff;
-}
-
-.product-detail {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
-  gap: 42px;
-  align-items: start;
-}
-
-.product-detail__gallery,
-.product-detail__info,
-.community-section,
-.product-detail__description,
+/* .category-tabs was for the pre-rewrite ProductListPage.jsx category filter
+ * UI — the current page filters differently and never renders this class. */
 .cart-summary,
 .order-summary,
 .order-form__section,
@@ -3141,104 +3082,8 @@ textarea {
   box-shadow: var(--shadow-sm);
 }
 
-.product-detail__main-image-frame {
-  display: grid;
-  aspect-ratio: 1 / 1;
-  place-items: center;
-  padding: 24px;
-  background: #fafafa;
-}
-
-.product-detail__main-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.product-detail__thumbnails {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-  gap: 10px;
-  padding-top: 12px;
-}
-
-.product-detail__thumbnail {
-  aspect-ratio: 1 / 1;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: #fff;
-}
-
-.product-detail__thumbnail--active {
-  border-color: var(--color-primary);
-  box-shadow: inset 0 0 0 1px var(--color-primary);
-}
-
-.product-detail__info {
-  padding: 26px;
-}
-
-.product-detail__name {
-  margin: 4px 0 10px;
-  font-size: clamp(1.65rem, 3vw, 2.45rem);
-  line-height: 1.22;
-  word-break: keep-all;
-}
-
-.product-detail__price {
-  margin: 22px 0;
-  padding: 18px 0;
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.product-detail__sale-price {
-  font-size: 1.85rem;
-  font-weight: 850;
-}
-
-.product-detail__notice {
-  display: grid;
-  grid-template-columns: 90px 1fr;
-  gap: 10px 16px;
-  margin: 18px 0;
-}
-
-.product-detail__notice dt {
-  color: var(--color-text-muted);
-}
-
-.product-detail__notice dd {
-  margin: 0;
-  font-weight: 650;
-}
-
 .quantity-selector {
   border-radius: var(--radius-md);
-}
-
-.product-detail__actions {
-  gap: 10px;
-}
-
-.product-detail__actions .btn {
-  flex: 1 1 0;
-}
-
-.product-detail__badge {
-  margin-left: 10px;
-  vertical-align: middle;
-  font-size: 0.9rem;
-}
-
-.product-detail__purchase-notice {
-  margin: 18px 0;
-  padding: 12px 14px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-alt);
-  color: var(--color-text-muted);
-  font-size: 0.88rem;
 }
 
 .table-scroll {
@@ -3296,23 +3141,6 @@ textarea {
   color: var(--color-text);
 }
 
-.community-section,
-.product-detail__description {
-  margin-top: 32px;
-  padding: 24px;
-  /* Keeps the target section's own heading clear of the sticky .site-header +
-   * sticky .detail-tabs bar when jumping here via a #product-reviews-style anchor. */
-  scroll-margin-top: 190px;
-}
-
-.community-list {
-  gap: 12px;
-}
-
-.community-item {
-  border-radius: var(--radius-md);
-  background: #fafafa;
-}
 
 .cart-page {
   display: grid;
@@ -3625,7 +3453,7 @@ textarea {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 767px) {
   .section {
     padding: 28px 0;
   }
@@ -3736,14 +3564,6 @@ textarea {
 }
 
 @media (max-width: 420px) {
-  .container {
-    padding-inline: 14px;
-  }
-
-  .product-grid {
-    gap: 10px;
-  }
-
   .category-quick-menu__item {
     min-height: 68px;
     padding: 12px;
@@ -3900,15 +3720,24 @@ textarea {
   font-weight: 700;
 }
 
+/* Vertical stack, not a single row — crossed-out original on its own line above
+ * the final price so the reading order is genuinely original -> discount ->
+ * final, not just left-to-right on one baseline. */
 .product-detail-price {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-6) 0;
+  padding: var(--space-6) 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.product-detail-price__final {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: 10px;
-  margin: 22px 0;
-  padding: 22px 0;
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-3);
 }
 
 .product-detail-price__discount {
@@ -3926,7 +3755,31 @@ textarea {
 
 .product-detail-price__original {
   color: var(--color-text-muted);
-  font-size: 1rem;
+  font-size: var(--font-size-base);
+}
+
+/* A visible tag, not buried in the info list — matches "박스 단위를 눈에 띄게
+ * 표기" from the design brief. */
+.product-detail-box-unit {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.product-detail-composition h3 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-md);
+}
+
+.product-detail-composition {
+  margin-bottom: var(--space-6);
 }
 
 .product-detail-info-list {
@@ -4265,7 +4118,7 @@ textarea {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 767px) {
   .product-detail-page {
     padding-bottom: 116px;
   }

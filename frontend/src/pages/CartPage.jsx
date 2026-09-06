@@ -21,6 +21,7 @@ export function CartPage() {
   const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const [removingIds, setRemovingIds] = useState(() => new Set());
+  const [updatingIds, setUpdatingIds] = useState(() => new Set());
 
   const loadCart = useCallback(
     (applyDefaultSelection) => {
@@ -68,13 +69,20 @@ export function CartPage() {
   }
 
   async function handleQuantityChange(cartItemId, nextQuantity) {
-    if (nextQuantity < 1) return;
+    if (nextQuantity < 1 || updatingIds.has(cartItemId)) return;
+    setUpdatingIds((current) => new Set(current).add(cartItemId));
     try {
       const updated = await cartApi.updateQuantity(cartItemId, nextQuantity);
       setCart(updated);
     } catch (error) {
       showToast(describeQuantityError(error), "error");
       loadCart();
+    } finally {
+      setUpdatingIds((current) => {
+        const next = new Set(current);
+        next.delete(cartItemId);
+        return next;
+      });
     }
   }
 
@@ -182,6 +190,7 @@ export function CartPage() {
               src={item.thumbnailUrl || PLACEHOLDER_IMAGE}
               alt={item.productName}
               className="cart-item__image"
+              loading="lazy"
               onError={(event) => {
                 event.currentTarget.onerror = null;
                 event.currentTarget.src = PLACEHOLDER_IMAGE;
@@ -193,11 +202,21 @@ export function CartPage() {
               {!item.available && <p className="cart-item__unavailable-reason">{describeUnavailable(item.unavailableReason)}</p>}
             </div>
             <div className="quantity-selector quantity-selector--compact">
-              <button type="button" onClick={() => handleQuantityChange(item.cartItemId, item.quantity - 1)} disabled={!item.available || item.quantity <= 1} aria-label="수량 감소">
+              <button
+                type="button"
+                onClick={() => handleQuantityChange(item.cartItemId, item.quantity - 1)}
+                disabled={!item.available || item.quantity <= 1 || updatingIds.has(item.cartItemId)}
+                aria-label="수량 감소"
+              >
                 -
               </button>
               <input type="text" readOnly value={item.quantity} aria-label="수량" />
-              <button type="button" onClick={() => handleQuantityChange(item.cartItemId, item.quantity + 1)} disabled={!item.available || item.quantity >= item.stockQuantity} aria-label="수량 증가">
+              <button
+                type="button"
+                onClick={() => handleQuantityChange(item.cartItemId, item.quantity + 1)}
+                disabled={!item.available || item.quantity >= item.stockQuantity || updatingIds.has(item.cartItemId)}
+                aria-label="수량 증가"
+              >
                 +
               </button>
             </div>

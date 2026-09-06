@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="ogBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f2f2f2"/>
+    </linearGradient>
+    <linearGradient id="ogBox" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b3546"/>
+      <stop offset="1" stop-color="#1f2937"/>
+    </linearGradient>
+    <linearGradient id="ogRibbon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#caa153"/>
+      <stop offset="1" stop-color="#b7791f"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#ogBg)"/>
+
+  <g transform="translate(120,165)">
+    <rect x="0" y="0" width="220" height="220" rx="46" fill="url(#ogBox)"/>
+    <rect x="97" y="16" width="26" height="188" fill="url(#ogRibbon)"/>
+    <rect x="16" y="97" width="188" height="26" fill="url(#ogRibbon)"/>
+    <path
+      d="M110 97 C82 71 68 46 90 32 C104 24 110 40 110 55 C110 40 116 24 130 32 C152 46 138 71 110 97 Z"
+      fill="url(#ogRibbon)"
+    />
+    <circle cx="110" cy="52" r="10" fill="#f0dca6"/>
+  </g>
+
+  <text x="420" y="270" font-family="'Apple SD Gothic Neo','Malgun Gothic',Arial,sans-serif" font-size="64" font-weight="700" fill="#18181b">세영선물세트</text>
+  <text x="420" y="330" font-family="'Apple SD Gothic Neo','Malgun Gothic',Arial,sans-serif" font-size="30" fill="#6b7280">마음을 담은 선물, 정성을 전하는 선물세트</text>
+
+  <g transform="translate(420,380)">
+    <rect x="0" y="0" width="170" height="52" rx="26" fill="#f5f5f5" stroke="#e5e5e5"/>
+    <text x="24" y="34" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#1f2937">튜나리챔 세트</text>
+  </g>
+  <g transform="translate(610,380)">
+    <rect x="0" y="0" width="140" height="52" rx="26" fill="#f5f5f5" stroke="#e5e5e5"/>
+    <text x="24" y="34" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#1f2937">스페셜 세트</text>
+  </g>
+</svg>

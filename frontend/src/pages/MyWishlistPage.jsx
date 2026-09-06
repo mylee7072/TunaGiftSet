@@ -5,6 +5,7 @@ import { EmptyState } from "../components/common/EmptyState";
 import { ErrorState } from "../components/common/ErrorState";
 import { ProductGridSkeleton } from "../components/common/Skeleton";
 import { Pagination } from "../components/common/Pagination";
+import { PageHeader } from "../components/common/PageHeader";
 import { ProductCard } from "../components/product/ProductCard";
 
 export function MyWishlistPage() {
@@ -39,13 +40,11 @@ export function MyWishlistPage() {
 
   return (
     <div className="container section wishlist-page">
-      <div className="page-header">
-        <div>
-          <p className="breadcrumb">홈 / 마이페이지 / 찜한 상품</p>
-          <h1 className="page-title">찜한 상품</h1>
-          <p>관심 있는 선물세트를 다시 확인하고 장바구니에 담아보세요.</p>
-        </div>
-      </div>
+      <PageHeader
+        breadcrumb="홈 / 마이페이지 / 찜한 상품"
+        title="찜한 상품"
+        description="관심 있는 선물세트를 다시 확인하고 장바구니에 담아보세요."
+      />
       {status === "loading" && <ProductGridSkeleton count={12} />}
       {status === "error" && (
         <ErrorState message="찜 목록을 불러오지 못했습니다." onRetry={() => setReloadKey((current) => current + 1)} />

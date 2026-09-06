@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
 import { useScrollRestoration } from "../../hooks/useScrollRestoration";
+import { Loading } from "../common/Loading";
 
 const NAV_ITEMS = [
   { to: "/admin", label: "대시보드", end: true },
@@ -40,7 +42,9 @@ export function AdminLayout() {
           <span>{member?.name} 관리자님</span>
         </header>
         <main className="admin-content">
-          <Outlet />
+          <Suspense fallback={<Loading />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

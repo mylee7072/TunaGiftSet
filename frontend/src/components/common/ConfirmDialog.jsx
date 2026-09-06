@@ -3,7 +3,8 @@ import { useDismissibleOverlay } from "../../hooks/useDismissibleOverlay";
 
 export function ConfirmDialog({ open, title, description, confirmLabel = "확인", cancelLabel = "취소", onConfirm, onCancel }) {
   const confirmButtonRef = useRef(null);
-  const { shouldRender, closing } = useDismissibleOverlay(open, onCancel);
+  const modalRef = useRef(null);
+  const { shouldRender, closing } = useDismissibleOverlay(open, onCancel, modalRef);
 
   useEffect(() => {
     if (open) {
@@ -20,6 +21,7 @@ export function ConfirmDialog({ open, title, description, confirmLabel = "확인
       onClick={onCancel}
     >
       <div
+        ref={modalRef}
         className={`modal${closing ? " modal--closing" : ""}`}
         role="alertdialog"
         aria-modal="true"

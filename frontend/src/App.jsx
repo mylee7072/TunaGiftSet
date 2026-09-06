@@ -1,3 +1,4 @@
+import { lazy } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
@@ -5,32 +6,37 @@ import { RootLayout } from "./components/layout/RootLayout";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { AdminRoute } from "./routes/AdminRoute";
-import { HomePage } from "./pages/HomePage";
-import { ProductListPage } from "./pages/ProductListPage";
-import { ProductDetailPage } from "./pages/ProductDetailPage";
-import { LoginPage } from "./pages/LoginPage";
-import { SignupPage } from "./pages/SignupPage";
-import { CartPage } from "./pages/CartPage";
-import { OrderFormPage } from "./pages/OrderFormPage";
-import { OrderCompletePage } from "./pages/OrderCompletePage";
-import { PaymentSuccessPage } from "./pages/PaymentSuccessPage";
-import { PaymentFailPage } from "./pages/PaymentFailPage";
-import { MyPage } from "./pages/MyPage";
-import { MyOrdersPage } from "./pages/MyOrdersPage";
-import { MyOrderDetailPage } from "./pages/MyOrderDetailPage";
-import { MyCouponsPage } from "./pages/MyCouponsPage";
-import { MyAddressesPage } from "./pages/MyAddressesPage";
-import { MyWishlistPage } from "./pages/MyWishlistPage";
-import { CompanyInfoPage } from "./pages/CompanyInfoPage";
-import { NotFoundPage } from "./pages/NotFoundPage";
-import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
-import { AdminProductListPage } from "./pages/admin/AdminProductListPage";
-import { AdminProductFormPage } from "./pages/admin/AdminProductFormPage";
-import { AdminCategoriesPage } from "./pages/admin/AdminCategoriesPage";
-import { AdminBrandsPage } from "./pages/admin/AdminBrandsPage";
-import { AdminOrderListPage } from "./pages/admin/AdminOrderListPage";
-import { AdminOrderDetailPage } from "./pages/admin/AdminOrderDetailPage";
-import { AdminCouponsPage } from "./pages/admin/AdminCouponsPage";
+
+// Route-level code splitting: every page below is its own chunk, only fetched
+// when its route is actually visited. Layouts/guards/providers above stay in
+// the main bundle since they're needed on every route regardless.
+const HomePage = lazy(() => import("./pages/HomePage").then((m) => ({ default: m.HomePage })));
+const ProductListPage = lazy(() => import("./pages/ProductListPage").then((m) => ({ default: m.ProductListPage })));
+const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage").then((m) => ({ default: m.ProductDetailPage })));
+const LoginPage = lazy(() => import("./pages/LoginPage").then((m) => ({ default: m.LoginPage })));
+const SignupPage = lazy(() => import("./pages/SignupPage").then((m) => ({ default: m.SignupPage })));
+const CartPage = lazy(() => import("./pages/CartPage").then((m) => ({ default: m.CartPage })));
+const OrderFormPage = lazy(() => import("./pages/OrderFormPage").then((m) => ({ default: m.OrderFormPage })));
+const OrderCompletePage = lazy(() => import("./pages/OrderCompletePage").then((m) => ({ default: m.OrderCompletePage })));
+const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage").then((m) => ({ default: m.PaymentSuccessPage })));
+const PaymentFailPage = lazy(() => import("./pages/PaymentFailPage").then((m) => ({ default: m.PaymentFailPage })));
+const MyPage = lazy(() => import("./pages/MyPage").then((m) => ({ default: m.MyPage })));
+const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage").then((m) => ({ default: m.MyOrdersPage })));
+const MyOrderDetailPage = lazy(() => import("./pages/MyOrderDetailPage").then((m) => ({ default: m.MyOrderDetailPage })));
+const MyCouponsPage = lazy(() => import("./pages/MyCouponsPage").then((m) => ({ default: m.MyCouponsPage })));
+const MyAddressesPage = lazy(() => import("./pages/MyAddressesPage").then((m) => ({ default: m.MyAddressesPage })));
+const MyWishlistPage = lazy(() => import("./pages/MyWishlistPage").then((m) => ({ default: m.MyWishlistPage })));
+const CompanyInfoPage = lazy(() => import("./pages/CompanyInfoPage").then((m) => ({ default: m.CompanyInfoPage })));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })));
+
+const AdminDashboardPage = lazy(() => import("./pages/admin/AdminDashboardPage").then((m) => ({ default: m.AdminDashboardPage })));
+const AdminProductListPage = lazy(() => import("./pages/admin/AdminProductListPage").then((m) => ({ default: m.AdminProductListPage })));
+const AdminProductFormPage = lazy(() => import("./pages/admin/AdminProductFormPage").then((m) => ({ default: m.AdminProductFormPage })));
+const AdminCategoriesPage = lazy(() => import("./pages/admin/AdminCategoriesPage").then((m) => ({ default: m.AdminCategoriesPage })));
+const AdminBrandsPage = lazy(() => import("./pages/admin/AdminBrandsPage").then((m) => ({ default: m.AdminBrandsPage })));
+const AdminOrderListPage = lazy(() => import("./pages/admin/AdminOrderListPage").then((m) => ({ default: m.AdminOrderListPage })));
+const AdminOrderDetailPage = lazy(() => import("./pages/admin/AdminOrderDetailPage").then((m) => ({ default: m.AdminOrderDetailPage })));
+const AdminCouponsPage = lazy(() => import("./pages/admin/AdminCouponsPage").then((m) => ({ default: m.AdminCouponsPage })));
 
 export default function App() {
   return (

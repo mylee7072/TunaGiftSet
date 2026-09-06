@@ -4,7 +4,8 @@ import { formatCouponCondition, formatCouponDiscount, formatCouponUnavailableRea
 
 export function CouponSelectModal({ open, coupons, selectedMemberCouponId, onSelect, onClose }) {
   const closeButtonRef = useRef(null);
-  const { shouldRender, closing } = useDismissibleOverlay(open, onClose);
+  const modalRef = useRef(null);
+  const { shouldRender, closing } = useDismissibleOverlay(open, onClose, modalRef);
 
   useEffect(() => {
     if (open) {
@@ -17,6 +18,7 @@ export function CouponSelectModal({ open, coupons, selectedMemberCouponId, onSel
   return (
     <div className={`modal-overlay${closing ? " modal-overlay--closing" : ""}`} role="presentation" onClick={onClose}>
       <div
+        ref={modalRef}
         className={`modal coupon-select-modal${closing ? " modal--closing" : ""}`}
         role="dialog"
         aria-modal="true"

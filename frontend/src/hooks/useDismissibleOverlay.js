@@ -15,7 +15,13 @@ const EXIT_DURATION_MS = 160;
 //    animation finishes — but only if focus is still "unclaimed" (on <body> or
 //    gone), so it never yanks focus away from something the user has since
 //    clicked into
-export function useDismissibleOverlay(open, onClose) {
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+// `containerRef` is optional — pass it to also trap Tab/Shift+Tab focus inside
+// the overlay while it's open (WCAG 2.4.3). Without it, this still handles ESC,
+// scroll-lock, and focus-return exactly as before.
+export function useDismissibleOverlay(open, onClose, containerRef) {
   const [shouldRender, setShouldRender] = useState(open);
   const [closing, setClosing] = useState(false);
   const triggerRef = useRef(null);
@@ -66,6 +72,31 @@ export function useDismissibleOverlay(open, onClose) {
       document.body.style.overflow = previousOverflow;
     };
   }, [shouldRender]);
+
+  useEffect(() => {
+    if (!shouldRender || !containerRef) return undefined;
+
+    function handleTab(event) {
+      if (event.key !== "Tab") return;
+      const container = containerRef.current;
+      if (!container) return;
+      const focusable = Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR));
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleTab);
+    return () => document.removeEventListener("keydown", handleTab);
+  }, [shouldRender, containerRef]);
 
   return { shouldRender, closing };
 }

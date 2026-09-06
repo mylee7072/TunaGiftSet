@@ -95,6 +95,7 @@ export function AddressForm({ initialValue, submitLabel = "저장", submitting =
       <div className="address-form__search-row">
         <input id="zipCode" name="zipCode" placeholder="우편번호" value={form.zipCode} onChange={handleChange} />
         <button type="button" className="btn btn--secondary" onClick={handleAddressSearch} disabled={searching}>
+          {searching && <span className="btn__spinner" aria-hidden="true" />}
           {searching ? "불러오는 중" : "주소검색"}
         </button>
       </div>
@@ -129,6 +130,7 @@ export function AddressForm({ initialValue, submitLabel = "저장", submitting =
           </button>
         )}
         <button type="submit" className="btn btn--primary" disabled={submitting}>
+          {submitting && <span className="btn__spinner" aria-hidden="true" />}
           {submitting ? "저장 중" : submitLabel}
         </button>
       </div>

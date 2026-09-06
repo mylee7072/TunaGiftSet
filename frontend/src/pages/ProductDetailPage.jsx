@@ -11,6 +11,8 @@ import { siteConfig } from "../config/siteConfig";
 import { fetchProductById } from "../data/products";
 import { useAuth } from "../context/useAuth";
 import { useToast } from "../context/useToast";
+import { useDocumentMeta } from "../hooks/useDocumentMeta";
+import { useProductJsonLd } from "../hooks/useProductJsonLd";
 import { formatDateTime, formatPrice } from "../utils/format";
 
 const PLACEHOLDER_IMAGE = "/placeholder-product.svg";
@@ -59,13 +61,12 @@ export function ProductDetailPage() {
     loadProduct();
   }, [loadProduct]);
 
-  useEffect(() => {
-    if (product) {
-      document.title = `${product.name} - ${siteConfig.siteName}`;
-    } else {
-      document.title = `상품 상세 - ${siteConfig.siteName}`;
-    }
-  }, [product]);
+  useDocumentMeta({
+    title: product ? `${product.name} - ${siteConfig.siteName}` : `상품 상세 - ${siteConfig.siteName}`,
+    description: product?.shortDescription,
+    image: product?.thumbnailImageUrl ? new URL(product.thumbnailImageUrl, window.location.origin).toString() : undefined,
+  });
+  useProductJsonLd(product);
 
   useEffect(() => {
     let ignore = false;
@@ -233,6 +234,7 @@ export function ProductDetailPage() {
                   <img
                     src={image.imageUrl}
                     alt=""
+                    loading="lazy"
                     onError={(event) => {
                       event.currentTarget.onerror = null;
                       event.currentTarget.src = PLACEHOLDER_IMAGE;
@@ -267,10 +269,14 @@ export function ProductDetailPage() {
           )}
 
           <div className="product-detail-price" aria-label="상품 가격">
-            {discountRate > 0 && hasDiscount && <span className="product-detail-price__discount">{discountRate}%</span>}
-            <strong className="product-detail-price__sale">{formatPrice(product.salePrice)}</strong>
             {hasDiscount && <del className="product-detail-price__original">{formatPrice(product.originalPrice)}</del>}
+            <div className="product-detail-price__final">
+              {discountRate > 0 && hasDiscount && <span className="product-detail-price__discount">{discountRate}%</span>}
+              <strong className="product-detail-price__sale">{formatPrice(product.salePrice)}</strong>
+            </div>
           </div>
+
+          {product.boxUnit && <p className="product-detail-box-unit">박스 단위 · {product.boxUnit}</p>}
 
           <dl className="product-detail-info-list">
             <div>
@@ -323,9 +329,11 @@ export function ProductDetailPage() {
               onChange={(response) => setWishlisted(response.wishlisted)}
             />
             <button type="button" className="btn btn--secondary btn--large" onClick={() => addToCart()} disabled={!isPurchasable || cartSubmitting}>
+              {cartSubmitting && <span className="btn__spinner" aria-hidden="true" />}
               {cartSubmitting ? "담는 중..." : "장바구니"}
             </button>
             <button type="button" className="btn btn--primary btn--large" onClick={handleBuyNow} disabled={!isPurchasable || cartSubmitting}>
+              {cartSubmitting && <span className="btn__spinner" aria-hidden="true" />}
               구매하기
             </button>
           </div>
@@ -353,6 +361,32 @@ export function ProductDetailPage() {
           <p className="product-detail-description__text">{product.description}</p>
         ) : (
           <EmptyState message="등록된 상세 설명이 없습니다." />
+        )}
+
+        {product.composition?.length > 0 && (
+          <div className="product-detail-composition">
+            <h3>상품 구성</h3>
+            <div className="table-scroll">
+              <table className="composition-table">
+                <thead>
+                  <tr>
+                    <th>품목</th>
+                    <th>중량</th>
+                    <th>수량</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {product.composition.map((item, index) => (
+                    <tr key={`${item.name}-${index}`}>
+                      <td>{item.name}</td>
+                      <td>{item.weight}</td>
+                      <td>{item.count}개</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
 
         <div className="product-detail-spec">
@@ -428,9 +462,11 @@ export function ProductDetailPage() {
       <div className="mobile-purchase-bar" aria-label="모바일 구매 바로가기">
         <WishlistButton productId={product.id} initialWishlisted={wishlisted} initialCount={product.wishlistCount} onChange={(response) => setWishlisted(response.wishlisted)} />
         <button type="button" className="btn btn--secondary" onClick={() => addToCart()} disabled={!isPurchasable || cartSubmitting}>
+          {cartSubmitting && <span className="btn__spinner" aria-hidden="true" />}
           장바구니
         </button>
         <button type="button" className="btn btn--primary" onClick={handleBuyNow} disabled={!isPurchasable || cartSubmitting}>
+          {cartSubmitting && <span className="btn__spinner" aria-hidden="true" />}
           구매하기
         </button>
       </div>

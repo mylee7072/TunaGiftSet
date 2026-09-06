@@ -21,6 +21,11 @@ export const PRODUCTS = [
     shortDescription: "참치와 리챔을 함께 담은 실속형 명절 선물 구성입니다.",
     description:
       "부담 없는 가격대와 익숙한 구성으로 명절 선물, 거래처 답례, 가족 선물에 두루 어울리는 선물세트입니다.",
+    boxUnit: "2세트/BOX",
+    composition: [
+      { name: "라이트스탠다드참치", weight: "135g", count: 10 },
+      { name: "리챔", weight: "200g", count: 4 },
+    ],
   },
   {
     id: 2,
@@ -42,6 +47,11 @@ export const PRODUCTS = [
     shortDescription: "여러 곳에 나누어 선물하기 좋은 기본형 구성입니다.",
     description:
       "참치캔과 리챔을 균형 있게 구성해 일상에서 활용도가 높은 상품입니다. 단체 선물이나 가족 선물로 선택하기 좋습니다.",
+    boxUnit: "3세트/BOX",
+    composition: [
+      { name: "라이트스탠다드참치", weight: "135g", count: 14 },
+      { name: "리챔 오리지널", weight: "200g", count: 2 },
+    ],
   },
   {
     id: 3,
@@ -63,6 +73,12 @@ export const PRODUCTS = [
     shortDescription: "참치, 리챔, 식용유를 함께 담은 풍성한 혼합 구성입니다.",
     description:
       "선물 받는 분의 활용도를 고려해 다양한 식품을 함께 담았습니다. 정갈한 패키지로 명절과 감사 선물에 어울립니다.",
+    boxUnit: "4세트/BOX",
+    composition: [
+      { name: "살코기참치", weight: "90g", count: 10 },
+      { name: "리챔", weight: "120g", count: 4 },
+      { name: "카놀라유", weight: "500ml", count: 2 },
+    ],
   },
   {
     id: 4,
@@ -84,6 +100,11 @@ export const PRODUCTS = [
     shortDescription: "가벼운 감사 인사에 알맞은 소형 선물세트입니다.",
     description:
       "부담 없는 구성으로 지인, 동료, 이웃에게 마음을 전하기 좋은 상품입니다. 현재는 준비된 수량이 모두 소진되었습니다.",
+    boxUnit: "",
+    composition: [
+      { name: "살코기참치", weight: "90g", count: 6 },
+      { name: "리챔", weight: "120g", count: 2 },
+    ],
   },
   {
     id: 5,
@@ -105,6 +126,12 @@ export const PRODUCTS = [
     shortDescription: "조금 더 격식을 갖춘 선물이 필요할 때 선택하기 좋은 구성입니다.",
     description:
       "가격대와 구성이 안정적인 프리미엄 선물세트입니다. 가족 선물은 물론 기업 답례품으로도 사용하기 좋습니다.",
+    boxUnit: "2세트/BOX",
+    composition: [
+      { name: "살코기참치", weight: "135g", count: 8 },
+      { name: "리챔더블라이트", weight: "200g", count: 4 },
+      { name: "건강요리유", weight: "500ml", count: 2 },
+    ],
   },
 ];
 

@@ -5,6 +5,7 @@ import { ListRowSkeleton } from "../components/common/Skeleton";
 import { EmptyState } from "../components/common/EmptyState";
 import { ErrorState } from "../components/common/ErrorState";
 import { Pagination } from "../components/common/Pagination";
+import { PageHeader } from "../components/common/PageHeader";
 import { classifyMemberCoupon, formatCouponCondition, formatCouponDiscount, formatDateTime } from "../utils/format";
 
 const TABS = [
@@ -49,13 +50,11 @@ export function MyCouponsPage() {
 
   return (
     <div className="container section coupon-wallet-page">
-      <div className="page-header">
-        <div>
-          <p className="breadcrumb">홈 / 마이페이지 / 쿠폰함</p>
-          <h1 className="page-title">내 쿠폰함</h1>
-          <p>주문서에서 사용할 수 있는 쿠폰과 유효기간을 확인하세요.</p>
-        </div>
-      </div>
+      <PageHeader
+        breadcrumb="홈 / 마이페이지 / 쿠폰함"
+        title="내 쿠폰함"
+        description="주문서에서 사용할 수 있는 쿠폰과 유효기간을 확인하세요."
+      />
 
       <div className="coupon-wallet-page__tabs" role="tablist">
         {TABS.map((tab) => (

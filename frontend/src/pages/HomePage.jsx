@@ -7,6 +7,7 @@ import { Loading } from "../components/common/Loading";
 import { ProductCard } from "../components/product/ProductCard";
 import { Reveal } from "../components/common/Reveal";
 import { siteConfig } from "../config/siteConfig";
+import { useDocumentMeta } from "../hooks/useDocumentMeta";
 
 export function HomePage() {
   const [categories, setCategories] = useState([]);
@@ -14,9 +15,10 @@ export function HomePage() {
   const [latestProducts, setLatestProducts] = useState([]);
   const [status, setStatus] = useState("loading");
 
-  useEffect(() => {
-    document.title = `${siteConfig.siteName} - ${siteConfig.tagline}`;
-  }, []);
+  useDocumentMeta({
+    title: `${siteConfig.siteName} - ${siteConfig.tagline}`,
+    description: "정성을 담은 선물, 세영선물세트에서 준비했습니다. 튜나리챔 세트, 스페셜 세트 등 명절과 답례 선물로 좋은 구성을 만나보세요.",
+  });
 
   useEffect(() => {
     loadHome();

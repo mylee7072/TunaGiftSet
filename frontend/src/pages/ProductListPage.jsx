@@ -7,6 +7,7 @@ import { Loading } from "../components/common/Loading";
 import { Pagination } from "../components/common/Pagination";
 import { ProductCard } from "../components/product/ProductCard";
 import { siteConfig } from "../config/siteConfig";
+import { useDocumentMeta } from "../hooks/useDocumentMeta";
 
 const PAGE_SIZE = 12;
 
@@ -62,9 +63,12 @@ export function ProductListPage() {
     }
   }, [brandId, categoryId, keyword, page, sort]);
 
-  useEffect(() => {
-    document.title = keyword ? `'${keyword}' 검색 결과 - ${siteConfig.siteName}` : `전체 상품 - ${siteConfig.siteName}`;
-  }, [keyword]);
+  useDocumentMeta({
+    title: keyword ? `'${keyword}' 검색 결과 - ${siteConfig.siteName}` : `전체 상품 - ${siteConfig.siteName}`,
+    description: selectedCategory
+      ? `${selectedCategory.name} - ${selectedCategory.description}`
+      : "구성과 가격을 비교해 필요한 선물세트를 골라보세요.",
+  });
 
   useEffect(() => {
     setKeywordInput(keyword);

@@ -24,5 +24,20 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          // React/ReactDOM/React Router rarely change between deploys — splitting
+          // them into their own chunk means a browser that already cached them
+          // only needs to re-download the (much smaller, more volatile) app
+          // chunk on the next release, instead of re-fetching everything.
+          manualChunks(id) {
+            if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/") || id.includes("node_modules/react-router")) {
+              return "vendor";
+            }
+          },
+        },
+      },
+    },
   };
 });

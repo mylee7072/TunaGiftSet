@@ -5,6 +5,7 @@ import { ConfirmDialog } from "../components/common/ConfirmDialog";
 import { EmptyState } from "../components/common/EmptyState";
 import { ErrorState } from "../components/common/ErrorState";
 import { Loading } from "../components/common/Loading";
+import { PageHeader } from "../components/common/PageHeader";
 import { useToast } from "../context/useToast";
 import { ApiError } from "../api/apiClient";
 import { formatAddress, formatPhone } from "../utils/format";
@@ -95,14 +96,18 @@ export function MyAddressesPage() {
 
   return (
     <div className="container section addresses-page">
-      <div className="page-header">
-        <h1 className="page-title">배송지 관리</h1>
-        {mode === "list" && (
-          <button type="button" className="btn btn--primary" onClick={() => setMode("create")}>
-            배송지 추가
-          </button>
-        )}
-      </div>
+      <PageHeader
+        breadcrumb="홈 / 마이페이지 / 배송지 관리"
+        title="배송지 관리"
+        description="자주 사용하는 배송지를 등록하고 기본배송지를 지정하세요."
+        action={
+          mode === "list" && (
+            <button type="button" className="btn btn--primary" onClick={() => setMode("create")}>
+              배송지 추가
+            </button>
+          )
+        }
+      />
 
       {mode === "create" && (
         <section className="address-editor">

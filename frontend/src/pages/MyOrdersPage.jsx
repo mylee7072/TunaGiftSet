@@ -5,6 +5,7 @@ import { ListRowSkeleton } from "../components/common/Skeleton";
 import { EmptyState } from "../components/common/EmptyState";
 import { ErrorState } from "../components/common/ErrorState";
 import { Pagination } from "../components/common/Pagination";
+import { PageHeader } from "../components/common/PageHeader";
 import { formatDateTime, formatOrderStatus, formatPrice } from "../utils/format";
 
 export function MyOrdersPage() {
@@ -27,13 +28,11 @@ export function MyOrdersPage() {
 
   return (
     <div className="container section orders-page">
-      <div className="page-header">
-        <div>
-          <p className="breadcrumb">홈 / 마이페이지 / 주문내역</p>
-          <h1 className="page-title">주문내역</h1>
-          <p>주문 상태와 결제금액을 확인할 수 있습니다.</p>
-        </div>
-      </div>
+      <PageHeader
+        breadcrumb="홈 / 마이페이지 / 주문내역"
+        title="주문내역"
+        description="주문 상태와 결제금액을 확인할 수 있습니다."
+      />
 
       {status === "loading" && <ListRowSkeleton count={4} />}
       {status === "error" && <ErrorState message="주문내역을 불러오지 못했습니다." />}
