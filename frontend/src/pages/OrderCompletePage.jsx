@@ -11,7 +11,7 @@ export function OrderCompletePage() {
   const [status, setStatus] = useState("loading");
 
   useEffect(() => {
-    document.title = "주문완료 - TunaGiftSet";
+    document.title = "주문완료 - SeyoungGiftSet";
     orderApi
       .findOrder(orderNumber)
       .then((data) => {

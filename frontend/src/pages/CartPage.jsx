@@ -39,7 +39,7 @@ export function CartPage() {
   );
 
   useEffect(() => {
-    document.title = "장바구니 - TunaGiftSet";
+    document.title = "장바구니 - SeyoungGiftSet";
     const preselectCartItemId = location.state?.preselectCartItemId;
     loadCart((data) => {
       if (preselectCartItemId) {

@@ -95,7 +95,7 @@ export function Header() {
         </button>
 
         <Link to="/" className="site-header__brand" onClick={() => setMenuOpen(false)}>
-          <span className="site-header__brand-mark" aria-hidden="true">선</span>
+          <img src="/logo-mark.svg" alt="" className="site-header__brand-mark" aria-hidden="true" width="34" height="34" />
           <span>{siteConfig.siteName}</span>
         </Link>
 

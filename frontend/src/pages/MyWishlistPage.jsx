@@ -20,7 +20,7 @@ export function MyWishlistPage() {
       .then((data) => {
         setPageData(data);
         setStatus("ready");
-        document.title = "찜한 상품 - TunaGiftSet";
+        document.title = "찜한 상품 - SeyoungGiftSet";
       })
       .catch(() => setStatus("error"));
   }, [page, reloadKey]);

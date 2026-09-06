@@ -21,7 +21,7 @@ export function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    document.title = "로그인 - TunaGiftSet";
+    document.title = "로그인 - SeyoungGiftSet";
   }, []);
 
   function handleChange(event) {

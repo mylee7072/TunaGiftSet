@@ -10,7 +10,7 @@ export function ProductCard({
   initialWishlisted = false,
   onWishlistChange,
 }) {
-  const isSoldOut = product.status === "SOLD_OUT" || product.stockQuantity === 0;
+  const isSoldOut = product.status === "SOLD_OUT" || product.soldOut || product.stockQuantity === 0;
   const isDiscontinued = product.status === "DISCONTINUED";
   const imageUrl = product.thumbnailImageUrl || product.images?.[0]?.imageUrl || PLACEHOLDER_IMAGE;
   const hasDiscount = product.originalPrice && product.salePrice && Number(product.originalPrice) > Number(product.salePrice);

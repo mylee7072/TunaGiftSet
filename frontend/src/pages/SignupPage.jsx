@@ -16,7 +16,7 @@ export function SignupPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    document.title = "회원가입 - TunaGiftSet";
+    document.title = "회원가입 - SeyoungGiftSet";
   }, []);
 
   function handleChange(event) {

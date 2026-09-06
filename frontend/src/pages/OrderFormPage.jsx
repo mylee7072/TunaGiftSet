@@ -65,7 +65,7 @@ export function OrderFormPage() {
   );
 
   useEffect(() => {
-    document.title = "주문서 - TunaGiftSet";
+    document.title = "주문서 - SeyoungGiftSet";
     loadPreview(selectedMemberCouponId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartItemIds.join(","), selectedMemberCouponId]);

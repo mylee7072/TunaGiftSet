@@ -18,7 +18,7 @@ export function AdminLayout() {
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
-        <div className="admin-sidebar__brand">TunaGiftSet Admin</div>
+        <div className="admin-sidebar__brand">SeyoungGiftSet Admin</div>
         <nav className="admin-sidebar__nav">
           {NAV_ITEMS.map((item) => (
             <NavLink

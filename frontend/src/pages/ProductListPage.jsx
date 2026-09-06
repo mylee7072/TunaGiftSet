@@ -13,7 +13,7 @@ export function ProductListPage() {
   const categoryId = searchParams.get("categoryId") || "";
 
   useEffect(() => {
-    document.title = keyword ? `'${keyword}' 검색 결과 - TunaGiftSet` : "전체 상품 - TunaGiftSet";
+    document.title = keyword ? `'${keyword}' 검색 결과 - SeyoungGiftSet` : "전체 상품 - SeyoungGiftSet";
   }, [keyword]);
 
   useEffect(() => {

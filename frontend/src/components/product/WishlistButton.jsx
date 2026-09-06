@@ -11,6 +11,7 @@ export function WishlistButton({
   initialCount = 0,
   className = "",
   onChange,
+  showText = false,
 }) {
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
@@ -64,7 +65,7 @@ export function WishlistButton({
   return (
     <button
       type="button"
-      className={`wishlist-button${wishlisted ? " wishlist-button--active" : ""}${pulse ? " wishlist-button--pulse" : ""}${className ? ` ${className}` : ""}`}
+      className={`wishlist-button${wishlisted ? " wishlist-button--active" : ""}${pulse ? " wishlist-button--pulse" : ""}${showText ? " wishlist-button--with-text" : ""}${className ? ` ${className}` : ""}`}
       onClick={handleClick}
       onAnimationEnd={() => setPulse(false)}
       disabled={submitting}
@@ -72,6 +73,7 @@ export function WishlistButton({
       aria-pressed={wishlisted}
     >
       <span aria-hidden="true" className="wishlist-button__icon">{wishlisted ? "♥" : "♡"}</span>
+      {showText && <span className="wishlist-button__label">{wishlisted ? "찜 취소" : "찜하기"}</span>}
       {wishlistCount > 0 && <span className="wishlist-button__count">{wishlistCount}</span>}
     </button>
   );

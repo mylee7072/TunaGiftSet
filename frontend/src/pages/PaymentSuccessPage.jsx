@@ -10,7 +10,7 @@ export function PaymentSuccessPage() {
   const hasRequestedRef = useRef(false);
 
   useEffect(() => {
-    document.title = "결제 확인 중 - TunaGiftSet";
+    document.title = "결제 확인 중 - SeyoungGiftSet";
     if (hasRequestedRef.current) return;
     hasRequestedRef.current = true;
 

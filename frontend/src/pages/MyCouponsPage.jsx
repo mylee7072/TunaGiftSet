@@ -29,7 +29,7 @@ export function MyCouponsPage() {
   const [status, setStatus] = useState("loading");
 
   useEffect(() => {
-    document.title = "쿠폰함 - TunaGiftSet";
+    document.title = "쿠폰함 - SeyoungGiftSet";
     setStatus("loading");
     couponApi
       .findMyCoupons(page, 50)

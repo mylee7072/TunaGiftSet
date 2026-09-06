@@ -24,28 +24,27 @@ export function formatDateTime(isoString) {
 export const ORDER_STATUS_LABEL = {
   PAYMENT_PENDING: "결제대기",
   PAID: "결제완료",
-  PREPARING: "상품준비중",
+  PREPARING: "상품 준비중",
   SHIPPING: "배송중",
   DELIVERED: "배송완료",
   CANCELED: "주문취소",
-  EXPIRED: "결제시간초과",
+  EXPIRED: "결제시간 초과",
 };
 
 export function formatOrderStatus(status) {
-  return ORDER_STATUS_LABEL[status] || status;
+  return ORDER_STATUS_LABEL[status] || status || "-";
 }
 
 export const PAYMENT_STATUS_LABEL = {
   READY: "결제대기",
-  IN_PROGRESS: "결제처리중",
+  IN_PROGRESS: "결제 처리중",
   PAID: "결제완료",
   CANCELED: "결제취소",
   FAILED: "결제실패",
 };
 
 export function formatPaymentStatus(status) {
-  if (!status) return "-";
-  return PAYMENT_STATUS_LABEL[status] || status;
+  return PAYMENT_STATUS_LABEL[status] || status || "-";
 }
 
 export const PAYMENT_METHOD_LABEL = {
@@ -57,13 +56,12 @@ export const PAYMENT_METHOD_LABEL = {
 };
 
 export function formatPaymentMethod(method) {
-  if (!method) return "-";
-  return PAYMENT_METHOD_LABEL[method] || method;
+  return PAYMENT_METHOD_LABEL[method] || method || "-";
 }
 
 export const DELIVERY_STATUS_LABEL = {
-  READY: "배송준비중",
-  PREPARING: "상품준비중",
+  READY: "배송 준비중",
+  PREPARING: "상품 준비중",
   SHIPPING: "배송중",
   DELIVERED: "배송완료",
   RETURNED: "반송",
@@ -71,8 +69,7 @@ export const DELIVERY_STATUS_LABEL = {
 };
 
 export function formatDeliveryStatus(status) {
-  if (!status) return "-";
-  return DELIVERY_STATUS_LABEL[status] || status;
+  return DELIVERY_STATUS_LABEL[status] || status || "-";
 }
 
 export function isCancelableOrderStatus(status) {
@@ -108,14 +105,13 @@ export function formatCouponCondition(coupon) {
 export const COUPON_UNAVAILABLE_REASON_LABEL = {
   COUPON_NOT_STARTED: "아직 사용 기간이 아닙니다.",
   COUPON_EXPIRED: "유효기간이 지난 쿠폰입니다.",
-  COUPON_MINIMUM_ORDER_NOT_MET: "최소 주문금액을 충족하지 않습니다.",
+  COUPON_MINIMUM_ORDER_NOT_MET: "최소 주문금액을 충족하지 않았습니다.",
   COUPON_ALREADY_RESERVED: "다른 주문에 사용 중인 쿠폰입니다.",
   COUPON_ALREADY_USED: "이미 사용한 쿠폰입니다.",
   COUPON_NOT_AVAILABLE: "사용할 수 없는 쿠폰입니다.",
 };
 
 export function formatCouponUnavailableReason(reason) {
-  if (!reason) return "";
   return COUPON_UNAVAILABLE_REASON_LABEL[reason] || "사용할 수 없는 쿠폰입니다.";
 }
 

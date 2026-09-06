@@ -14,7 +14,7 @@ export function MyOrdersPage() {
   const [status, setStatus] = useState("loading");
 
   useEffect(() => {
-    document.title = "주문내역 - TunaGiftSet";
+    document.title = "주문내역 - SeyoungGiftSet";
     setStatus("loading");
     orderApi
       .findOrders(page, 10)
