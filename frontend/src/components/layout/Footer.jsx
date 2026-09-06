@@ -1,7 +1,12 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { siteConfig } from "../../config/siteConfig";
+import { getCompanyInfoEntries } from "../../config/company";
 
 export function Footer() {
+  const [expanded, setExpanded] = useState(false);
+  const entries = getCompanyInfoEntries();
+
   return (
     <footer className="site-footer">
       <div className="container site-footer__inner">
@@ -29,11 +34,33 @@ export function Footer() {
             <dt>운영시간</dt>
             <dd>{siteConfig.supportHours}</dd>
           </div>
-          <div>
-            <dt>사업자 정보</dt>
-            <dd>운영 전 등록 예정</dd>
-          </div>
         </dl>
+
+        <div className="site-footer__business">
+          <button
+            type="button"
+            className="community-item__toggle site-footer__business-toggle"
+            aria-expanded={expanded}
+            aria-controls="footer-business-info"
+            onClick={() => setExpanded((current) => !current)}
+          >
+            <span>사업자정보확인</span>
+            <span className="community-item__toggle-icon" aria-hidden="true">▾</span>
+          </button>
+          <div id="footer-business-info" className={`community-item__collapsible${expanded ? " is-expanded" : ""}`}>
+            <div className="community-item__collapsible-inner">
+              <dl className="site-footer__business-table">
+                {entries.map((entry) => (
+                  <div key={entry.label}>
+                    <dt>{entry.label}</dt>
+                    <dd>{entry.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <Link to="/company" className="link-button">사업자 정보 전체 보기</Link>
+            </div>
+          </div>
+        </div>
 
         <p className="site-footer__copyright">
           © {new Date().getFullYear()} {siteConfig.siteNameEn}. All rights reserved.

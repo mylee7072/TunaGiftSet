@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f2f2f2"/>
+    </linearGradient>
+    <linearGradient id="box3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6b7280"/>
+      <stop offset="1" stop-color="#525252"/>
+    </linearGradient>
+    <linearGradient id="lid3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7c8794"/>
+      <stop offset="1" stop-color="#6b7280"/>
+    </linearGradient>
+    <linearGradient id="ribbon3" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c7cad1"/>
+      <stop offset="1" stop-color="#9aa0ab"/>
+    </linearGradient>
+    <linearGradient id="can3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8e8ea"/>
+      <stop offset="1" stop-color="#c7c9cf"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="800" fill="url(#bg3)"/>
+  <ellipse cx="400" cy="600" rx="170" ry="20" fill="#000000" opacity="0.05"/>
+
+  <!-- smaller gift box, more whitespace around it to read as "compact / 소량" -->
+  <g>
+    <rect x="270" y="400" width="260" height="150" rx="12" fill="url(#box3)"/>
+    <rect x="270" y="376" width="260" height="42" rx="8" fill="url(#lid3)"/>
+    <rect x="384" y="376" width="32" height="174" fill="url(#ribbon3)"/>
+    <rect x="270" y="392" width="260" height="14" fill="url(#ribbon3)"/>
+    <path d="M400 376 C372 354 350 318 380 306 C394 300 400 322 400 336 C400 322 406 300 420 306 C450 318 428 354 400 376 Z" fill="url(#ribbon3)"/>
+    <circle cx="400" cy="330" r="9" fill="#dcdfe4"/>
+  </g>
+
+  <!-- five small cans on the lid -->
+  <g>
+    <g>
+      <ellipse cx="300" cy="356" rx="15" ry="7" fill="#9aa0ab"/>
+      <rect x="285" y="328" width="30" height="28" fill="url(#can3)"/>
+      <ellipse cx="300" cy="328" rx="15" ry="7" fill="#f2f3f5"/>
+      <ellipse cx="300" cy="328" rx="10" ry="4.5" fill="#5b6472"/>
+    </g>
+    <g>
+      <ellipse cx="342" cy="356" rx="15" ry="7" fill="#9aa0ab"/>
+      <rect x="327" y="328" width="30" height="28" fill="url(#can3)"/>
+      <ellipse cx="342" cy="328" rx="15" ry="7" fill="#f2f3f5"/>
+      <ellipse cx="342" cy="328" rx="10" ry="4.5" fill="#5b6472"/>
+    </g>
+    <g>
+      <ellipse cx="458" cy="356" rx="15" ry="7" fill="#9aa0ab"/>
+      <rect x="443" y="328" width="30" height="28" fill="url(#can3)"/>
+      <ellipse cx="458" cy="328" rx="15" ry="7" fill="#f2f3f5"/>
+      <ellipse cx="458" cy="328" rx="10" ry="4.5" fill="#5b6472"/>
+    </g>
+    <g>
+      <ellipse cx="500" cy="356" rx="15" ry="7" fill="#9aa0ab"/>
+      <rect x="485" y="328" width="30" height="28" fill="url(#can3)"/>
+      <ellipse cx="500" cy="328" rx="15" ry="7" fill="#f2f3f5"/>
+      <ellipse cx="500" cy="328" rx="10" ry="4.5" fill="#5b6472"/>
+    </g>
+  </g>
+  <!-- 5th can centered above the ribbon, slightly higher to feel intentionally arranged -->
+  <g>
+    <ellipse cx="400" cy="300" rx="15" ry="7" fill="#9aa0ab"/>
+    <rect x="385" y="272" width="30" height="28" fill="url(#can3)"/>
+    <ellipse cx="400" cy="272" rx="15" ry="7" fill="#f2f3f5"/>
+    <ellipse cx="400" cy="272" rx="10" ry="4.5" fill="#5b6472"/>
+  </g>
+
+  <g transform="translate(486,414) rotate(14)">
+    <rect x="0" y="0" width="70" height="34" rx="6" fill="#ffffff" stroke="#9aa0ab" stroke-width="2"/>
+    <text x="12" y="22" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#374151">5호</text>
+  </g>
+
+  <text x="400" y="660" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic',Arial,sans-serif" font-size="28" font-weight="700" fill="#18181b">참치 선물세트 5호 (소량)</text>
+  <text x="400" y="694" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic',Arial,sans-serif" font-size="18" fill="#6b7280">COMPACT TUNA GIFT SET</text>
+</svg>

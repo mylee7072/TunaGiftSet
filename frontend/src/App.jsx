@@ -21,6 +21,7 @@ import { MyOrderDetailPage } from "./pages/MyOrderDetailPage";
 import { MyCouponsPage } from "./pages/MyCouponsPage";
 import { MyAddressesPage } from "./pages/MyAddressesPage";
 import { MyWishlistPage } from "./pages/MyWishlistPage";
+import { CompanyInfoPage } from "./pages/CompanyInfoPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { AdminProductListPage } from "./pages/admin/AdminProductListPage";
@@ -59,6 +60,7 @@ export default function App() {
               <Route path="signup" element={<SignupPage />} />
               <Route path="payment/success" element={<PaymentSuccessPage />} />
               <Route path="payment/fail" element={<PaymentFailPage />} />
+              <Route path="company" element={<CompanyInfoPage />} />
 
               <Route element={<ProtectedRoute />}>
                 <Route path="cart" element={<CartPage />} />

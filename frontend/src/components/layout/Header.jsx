@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { siteConfig } from "../../config/siteConfig";
+import { PRODUCT_CATEGORIES } from "../../data/categories";
 import { useAuth } from "../../context/useAuth";
 import { useDismissibleOverlay } from "../../hooks/useDismissibleOverlay";
 import { cartApi } from "../../api/cartApi";
-import { categoryApi } from "../../api/productApi";
 
 export function Header() {
   const { isAuthenticated, member, logout } = useAuth();
@@ -168,23 +168,14 @@ export function Header() {
 }
 
 function CategoryLinks({ activeCategoryId, onNavigate }) {
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    categoryApi.findActiveCategories().then(setCategories).catch(() => setCategories([]));
-  }, []);
-
-  return categories
-    .filter((category) => !category.parentId)
-    .sort((a, b) => a.displayOrder - b.displayOrder)
-    .map((category) => (
-      <Link
-        key={category.id}
-        to={`/products?categoryId=${category.id}`}
-        className={String(activeCategoryId) === String(category.id) ? "is-active" : ""}
-        onClick={onNavigate}
-      >
-        {category.name}
-      </Link>
-    ));
+  return PRODUCT_CATEGORIES.map((category) => (
+    <Link
+      key={category.id}
+      to={`/products?categoryId=${category.id}`}
+      className={activeCategoryId === category.id ? "is-active" : ""}
+      onClick={onNavigate}
+    >
+      {category.name}
+    </Link>
+  ));
 }

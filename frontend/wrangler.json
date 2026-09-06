@@ -1,0 +1,13 @@
+{
+  "name": "tunagiftset",
+  "compatibility_date": "2026-01-01",
+  "main": "worker.js",
+  "vars": {
+    "API_ORIGIN": "https://filters-bloggers-economies-flashers.trycloudflare.com"
+  },
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
+  }
+}

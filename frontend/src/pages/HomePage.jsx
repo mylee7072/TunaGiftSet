@@ -1,39 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { productApi, categoryApi } from "../api/productApi";
-import { ProductCard } from "../components/product/ProductCard";
-import { ProductGridSkeleton } from "../components/common/Skeleton";
-import { ErrorState } from "../components/common/ErrorState";
+import { PRODUCT_CATEGORIES } from "../data/categories";
+import { findProducts } from "../data/products";
+import { StaticProductCard } from "../components/product/StaticProductCard";
 import { Reveal } from "../components/common/Reveal";
 import { siteConfig } from "../config/siteConfig";
 
 export function HomePage() {
-  const [categories, setCategories] = useState([]);
-  const [featured, setFeatured] = useState(null);
-  const [latest, setLatest] = useState(null);
-  const [error, setError] = useState(null);
-
   useEffect(() => {
     document.title = `${siteConfig.siteName} - ${siteConfig.tagline}`;
   }, []);
-
-  useEffect(() => {
-    categoryApi.findActiveCategories().then(setCategories).catch(() => setCategories([]));
-
-    Promise.all([
-      productApi.findProducts({ featured: true, size: 4, sort: "LATEST" }),
-      productApi.findProducts({ size: 8, sort: "LATEST" }),
-    ])
-      .then(([featuredPage, latestPage]) => {
-        setFeatured(featuredPage.content);
-        setLatest(latestPage.content);
-      })
-      .catch(() => setError("상품을 불러오지 못했습니다."));
-  }, []);
-
-  const rootCategories = categories
-    .filter((category) => !category.parentId)
-    .sort((a, b) => a.displayOrder - b.displayOrder);
 
   return (
     <div className="home-page">
@@ -48,9 +24,6 @@ export function HomePage() {
             <div className="hero__actions">
               <Link to="/products" className="btn btn--primary btn--large">
                 선물세트 둘러보기
-              </Link>
-              <Link to="/products?sort=LATEST" className="btn btn--secondary btn--large">
-                새 상품 보기
               </Link>
             </div>
           </div>
@@ -69,61 +42,35 @@ export function HomePage() {
           <Link to="/products" className="section-header__link">전체보기</Link>
         </div>
         <div className="category-quick-menu">
-          {rootCategories.map((category) => (
+          {PRODUCT_CATEGORIES.map((category) => (
             <Link key={category.id} to={`/products?categoryId=${category.id}`} className="category-quick-menu__item">
               <span className="category-quick-menu__mark" aria-hidden="true">{category.name.slice(0, 1)}</span>
               <span>{category.name}</span>
             </Link>
           ))}
-          {categories.length === 0 && <p className="muted">카테고리 정보를 준비 중입니다.</p>}
         </div>
       </Reveal>
 
-      {error && (
-        <div className="container">
-          <ErrorState message={error} />
-        </div>
-      )}
-
-      {!error && featured === null && (
-        <div className="container section">
-          <ProductGridSkeleton count={4} />
-        </div>
-      )}
-
-      {featured && featured.length > 0 && (
-        <Reveal as="section" className="container section">
-          <div className="section-header">
-            <div>
-              <h2 className="section__title">추천 선물세트</h2>
-              <p className="section__description">선물용으로 고르기 좋은 대표 상품입니다.</p>
+      {PRODUCT_CATEGORIES.map((category) => {
+        const products = findProducts({ categoryId: category.id });
+        if (products.length === 0) return null;
+        return (
+          <Reveal as="section" className="container section" key={category.id}>
+            <div className="section-header">
+              <div>
+                <h2 className="section__title">{category.name}</h2>
+                <p className="section__description">{category.description}</p>
+              </div>
+              <Link to={`/products?categoryId=${category.id}`} className="section-header__link">전체보기</Link>
             </div>
-            <Link to="/products?featured=true" className="section-header__link">전체보기</Link>
-          </div>
-          <div className="product-grid">
-            {featured.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </Reveal>
-      )}
-
-      {latest && latest.length > 0 && (
-        <Reveal as="section" className="container section">
-          <div className="section-header">
-            <div>
-              <h2 className="section__title">새로 준비한 상품</h2>
-              <p className="section__description">최근 등록된 선물세트를 확인해 보세요.</p>
+            <div className="product-grid">
+              {products.map((product) => (
+                <StaticProductCard key={product.id} product={product} />
+              ))}
             </div>
-            <Link to="/products?sort=LATEST" className="section-header__link">전체보기</Link>
-          </div>
-          <div className="product-grid">
-            {latest.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </Reveal>
-      )}
+          </Reveal>
+        );
+      })}
 
       <Reveal as="section" className="container section gift-info">
         <div>

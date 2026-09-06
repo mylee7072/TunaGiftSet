@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f2f2f2"/>
+    </linearGradient>
+    <linearGradient id="box2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4b5563"/>
+      <stop offset="1" stop-color="#374151"/>
+    </linearGradient>
+    <linearGradient id="lid2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5b6472"/>
+      <stop offset="1" stop-color="#4b5563"/>
+    </linearGradient>
+    <linearGradient id="ribbon2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d5574a"/>
+      <stop offset="1" stop-color="#c0392b"/>
+    </linearGradient>
+    <linearGradient id="canA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8e8ea"/>
+      <stop offset="1" stop-color="#c7c9cf"/>
+    </linearGradient>
+    <linearGradient id="canB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f3ddb0"/>
+      <stop offset="1" stop-color="#e3c48a"/>
+    </linearGradient>
+    <linearGradient id="canC" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d7e3df"/>
+      <stop offset="1" stop-color="#b7c9c2"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="800" fill="url(#bg2)"/>
+  <ellipse cx="400" cy="640" rx="230" ry="26" fill="#000000" opacity="0.06"/>
+
+  <!-- gift box -->
+  <g>
+    <rect x="170" y="366" width="460" height="224" rx="14" fill="url(#box2)"/>
+    <rect x="170" y="336" width="460" height="58" rx="10" fill="url(#lid2)"/>
+    <rect x="378" y="336" width="44" height="254" fill="url(#ribbon2)"/>
+    <rect x="170" y="357" width="460" height="20" fill="url(#ribbon2)"/>
+    <path d="M400 336 C360 306 330 256 372 238 C392 230 400 260 400 280 C400 260 408 230 428 238 C470 256 440 306 400 336 Z" fill="url(#ribbon2)"/>
+    <circle cx="400" cy="298" r="12" fill="#e58879"/>
+  </g>
+
+  <!-- three different product "cans/jars" to signal a mixed assortment -->
+  <g>
+    <!-- tall tuna can -->
+    <ellipse cx="238" cy="302" rx="24" ry="10" fill="#9aa0ab"/>
+    <rect x="214" y="252" width="48" height="50" fill="url(#canA)"/>
+    <ellipse cx="238" cy="252" rx="24" ry="10" fill="#f2f3f5"/>
+    <ellipse cx="238" cy="252" rx="15" ry="6" fill="#5b6472"/>
+
+    <!-- short wide jar (sauce/condiment) -->
+    <ellipse cx="330" cy="308" rx="28" ry="10" fill="#c8a45f"/>
+    <rect x="302" y="276" width="56" height="32" rx="4" fill="url(#canB)"/>
+    <rect x="316" y="258" width="28" height="20" rx="3" fill="#c8a45f"/>
+    <ellipse cx="330" cy="258" rx="14" ry="5" fill="#dbb877"/>
+
+    <!-- second tuna can -->
+    <ellipse cx="470" cy="302" rx="24" ry="10" fill="#9aa0ab"/>
+    <rect x="446" y="252" width="48" height="50" fill="url(#canA)"/>
+    <ellipse cx="470" cy="252" rx="24" ry="10" fill="#f2f3f5"/>
+    <ellipse cx="470" cy="252" rx="15" ry="6" fill="#5b6472"/>
+
+    <!-- bottle (oil) -->
+    <rect x="548" y="238" width="34" height="70" rx="6" fill="url(#canC)"/>
+    <rect x="558" y="220" width="14" height="22" rx="4" fill="#8fa79e"/>
+    <ellipse cx="565" cy="308" rx="17" ry="7" fill="#93a89f"/>
+  </g>
+
+  <g transform="translate(506,396) rotate(14)">
+    <rect x="0" y="0" width="112" height="40" rx="6" fill="#ffffff" stroke="#c0392b" stroke-width="2"/>
+    <text x="12" y="25" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#1f2937">VALUE SET</text>
+  </g>
+
+  <text x="400" y="700" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic',Arial,sans-serif" font-size="30" font-weight="700" fill="#18181b">혼합 선물세트 실속형</text>
+  <text x="400" y="736" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic',Arial,sans-serif" font-size="20" fill="#6b7280">MIXED ASSORTMENT GIFT SET</text>
+</svg>
