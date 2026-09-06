@@ -1,0 +1,112 @@
+# Base stack shared by every environment: db + backend + frontend, with the Postgres port
+# NOT published to the host (see compose.override.yaml for the dev-only exception).
+#
+#   docker compose up -d --build      dev: start (compose.override.yaml is auto-merged in,
+#                                      no -f flags needed — see that file and the README)
+#   docker compose ps                 check status/health
+#   docker compose logs -f backend    tail one service's logs
+#   docker compose down               stop and remove containers (DB DATA IS KEPT — see below)
+#   docker compose down -v            !! ALSO DELETES the postgres_data volume — irreversible !!
+#
+# For a prod-leaning run: `docker compose -f compose.yaml -f compose.prod.yaml up -d --build`
+# Passing explicit -f flags like that skips compose.override.yaml entirely, which is exactly
+# what keeps the Postgres port from ever being published outside of a plain dev `up`.
+#
+# This Postgres container is a separate instance from any Postgres you already run locally
+# for IntelliJ — same DB_NAME by convention, but its data lives in its own Docker volume.
+
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: tunagiftset-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-tunagiftset}
+      POSTGRES_USER: ${DB_USERNAME:?set DB_USERNAME in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    # No `ports:` here on purpose — the DB is reachable only from other containers on
+    # tunagiftset-net (as db:5432), never from the host, unless compose.override.yaml adds
+    # that back in for local dev convenience. See section on DB exposure in the README.
+    volumes:
+      # postgres:18+ images changed their expected layout: the mount point is the parent
+      # /var/lib/postgresql directory (PGDATA lives in a version-named subdirectory under it),
+      # not /var/lib/postgresql/data as with older postgres images. Mounting at .../data here
+      # would make every restart look like an upgrade from an unversioned old-style datadir.
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-tunagiftset}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - tunagiftset-net
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tunagiftset-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      # "db" is the Compose service name above, resolved via Docker's internal DNS — never
+      # localhost, which inside this container would mean the container itself, not the DB.
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-tunagiftset}
+      DB_USERNAME: ${DB_USERNAME:?set DB_USERNAME in .env}
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      JWT_EXPIRES_IN_SECONDS: ${JWT_EXPIRES_IN_SECONDS:-3600}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:8081}
+      TOSS_BASE_URL: ${TOSS_BASE_URL:-https://api.tosspayments.com}
+      TOSS_SECRET_KEY: ${TOSS_SECRET_KEY:-}
+      STORAGE_TYPE: ${STORAGE_TYPE:-local}
+      STORAGE_PUBLIC_BASE_URL: ${STORAGE_PUBLIC_BASE_URL:-http://localhost:${BACKEND_HOST_PORT:-8080}/uploads}
+      LOCAL_UPLOAD_DIR: /app/uploads
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-}
+      AWS_REGION: ${AWS_REGION:-ap-northeast-2}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      PAYMENT_EXPIRATION_SCHEDULER_ENABLED: ${PAYMENT_EXPIRATION_SCHEDULER_ENABLED:-false}
+    ports:
+      - "${BACKEND_HOST_PORT:-8080}:8080"
+    volumes:
+      # Only matters when STORAGE_TYPE=local; irrelevant (but harmless) under STORAGE_TYPE=s3.
+      # Without this, uploaded images vanish every time the container is recreated.
+      - backend_uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - tunagiftset-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_TOSS_CLIENT_KEY: ${VITE_TOSS_CLIENT_KEY:-}
+    container_name: tunagiftset-frontend
+    ports:
+      - "${FRONTEND_HOST_PORT:-8081}:8080"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - tunagiftset-net
+
+volumes:
+  postgres_data:
+  backend_uploads:
+
+networks:
+  tunagiftset-net:
+    driver: bridge

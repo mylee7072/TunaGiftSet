@@ -1,0 +1,29 @@
+# Prod-leaning overlay — NOT a full production deployment (no HTTPS/DNS/real server here,
+# see the completion report). Layer this on top of the base file explicitly:
+#
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d --build
+#
+# Using explicit -f flags like this means compose.override.yaml is NOT auto-merged in, so
+# the DB port stays unpublished — that's the mechanism, not an accident. Do not add a `db.ports`
+# override here.
+
+services:
+  backend:
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    # Real resource limits depend on the target server's actual specs, which this step does
+    # not decide (see the completion report). Uncomment and size these once that's known —
+    # an unset JVM heap inside a memory-limited container risks an OOMKilled restart loop.
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 768M
+    #     reservations:
+    #       memory: 384M
+
+  frontend:
+    # Same caveat as backend — fill in once real server sizing is decided.
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 128M

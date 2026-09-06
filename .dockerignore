@@ -1,0 +1,37 @@
+# Keep the backend build context small and make sure nothing sensitive or
+# machine-specific ever reaches a Docker image layer.
+
+.git
+.gradle
+build
+out
+.idea
+*.iml
+*.ipr
+*.iws
+.vscode
+.settings
+.classpath
+.project
+
+# Secrets / local-only config — must never end up in an image layer.
+.env
+.env.*
+!.env.example
+application-local.properties
+application-local.yml
+application-secret.properties
+application-secret.yml
+
+# Local upload storage and logs — irrelevant to the build, and uploads/ can contain
+# real uploaded files on a dev machine.
+uploads
+tunagiftset/uploads
+logs
+*.log
+
+# Frontend has its own build context / .dockerignore.
+frontend/node_modules
+frontend/dist
+
+README.md

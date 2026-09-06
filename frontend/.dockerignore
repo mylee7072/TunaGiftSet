@@ -1,0 +1,15 @@
+node_modules
+dist
+.git
+.vscode
+.idea
+
+# Secrets / local-only env — never bake real values into an image layer this way;
+# VITE_* build args are passed explicitly via `docker build --build-arg` / compose instead.
+.env
+.env.*
+!.env.example
+
+npm-debug.log*
+coverage
+*.local

@@ -1,0 +1,16 @@
+# Automatically merged into compose.yaml by a plain `docker compose up` / `up -d --build`
+# with no -f flags — this is Compose's built-in dev-override convention, not something this
+# project invented. Passing explicit -f flags (as compose.prod.yaml's usage does) skips this
+# file entirely, which is what keeps the DB port un-published outside of local dev.
+#
+# Contains ONLY dev convenience on top of the shared base — nothing here should be relied on
+# for prod behavior.
+
+services:
+  db:
+    ports:
+      # Host-side only, so a local DB GUI (DBeaver, psql, etc.) can connect to the
+      # Dockerized dev database. Mapped off 5432 by default to avoid colliding with a
+      # Postgres you may already run locally for IntelliJ. The backend container itself
+      # never uses this — it always talks to db:5432 over the internal network.
+      - "${DB_HOST_PORT:-5433}:5432"
