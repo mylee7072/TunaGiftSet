@@ -946,6 +946,16 @@ textarea {
   margin-top: 8px;
 }
 
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field label {
+  margin-top: 8px;
+}
+
 .auth-form input,
 .order-form input,
 .order-form select,
@@ -958,6 +968,15 @@ textarea {
   border-radius: var(--radius-sm);
   background: var(--color-surface);
   font-family: inherit;
+}
+
+.auth-form input.is-invalid {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(190, 24, 24, 0.12);
+}
+
+.auth-form input.is-invalid:focus {
+  outline-color: var(--color-danger);
 }
 
 .auth-form button,
@@ -975,6 +994,23 @@ textarea {
   color: var(--color-danger);
   font-size: 0.85rem;
   margin: 4px 0 0;
+}
+
+.form-field__error {
+  color: var(--color-danger);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  margin: -1px 0 0;
+}
+
+.auth-form__server-error {
+  padding: 12px 14px;
+  border: 1px solid rgba(190, 24, 24, 0.28);
+  border-radius: var(--radius-sm);
+  background: rgba(254, 242, 242, 0.9);
+  color: var(--color-danger);
+  font-size: 0.88rem;
+  line-height: 1.45;
 }
 
 .form-hint {

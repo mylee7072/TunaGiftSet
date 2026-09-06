@@ -1,7 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
-import { ApiError } from "../api/apiClient";
+import {
+  LOGIN_FIELD_ORDER,
+  getFirstInvalidField,
+  resolveAuthServerError,
+  validateLoginField,
+  validateLoginForm,
+} from "../utils/authValidation";
+
+const FIELD_IDS = {
+  email: "login-email",
+  password: "login-password",
+};
 
 function resolveRedirectTarget(location) {
   const from = location.state?.from;
@@ -17,8 +28,11 @@ export function LoginPage() {
   const location = useLocation();
 
   const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [validatedFields, setValidatedFields] = useState(() => new Set());
+  const [serverError, setServerError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const fieldRefs = useRef({});
 
   useEffect(() => {
     document.title = "로그인 - SeyoungGiftSet";
@@ -26,21 +40,35 @@ export function LoginPage() {
 
   function handleChange(event) {
     const { name, value } = event.target;
-    setForm((current) => ({ ...current, [name]: value }));
+    setServerError("");
+    setForm((current) => {
+      const next = { ...current, [name]: value };
+      if (validatedFields.has(name)) {
+        setFieldErrors((currentErrors) => {
+          const message = validateLoginField(name, next);
+          const nextErrors = { ...currentErrors };
+          if (message) {
+            nextErrors[name] = message;
+          } else {
+            delete nextErrors[name];
+          }
+          return nextErrors;
+        });
+      }
+      return next;
+    });
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setError("");
+    const validationErrors = validateLoginForm(form);
+    setValidatedFields(new Set(LOGIN_FIELD_ORDER));
+    setFieldErrors(validationErrors);
+    setServerError("");
 
-    if (!form.email.trim()) {
-      setError("이메일과 비밀번호를 입력해 주세요.");
-      document.getElementById("login-email")?.focus();
-      return;
-    }
-    if (!form.password) {
-      setError("이메일과 비밀번호를 입력해 주세요.");
-      document.getElementById("login-password")?.focus();
+    const firstInvalidField = getFirstInvalidField(LOGIN_FIELD_ORDER, validationErrors);
+    if (firstInvalidField) {
+      fieldRefs.current[firstInvalidField]?.focus();
       return;
     }
 
@@ -49,11 +77,33 @@ export function LoginPage() {
       await login(form.email.trim(), form.password);
       navigate(resolveRedirectTarget(location), { replace: true });
     } catch (submitError) {
-      setError(submitError instanceof ApiError ? submitError.message : "로그인에 실패했습니다.");
-      document.getElementById("login-password")?.focus();
+      setServerError(resolveAuthServerError(submitError));
+      fieldRefs.current.password?.focus();
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function renderFieldError(fieldName) {
+    const message = fieldErrors[fieldName];
+    if (!message) return null;
+    return (
+      <p id={`${FIELD_IDS[fieldName]}-error`} className="form-field__error">
+        {message}
+      </p>
+    );
+  }
+
+  function getInputProps(fieldName) {
+    const hasError = Boolean(fieldErrors[fieldName]);
+    return {
+      ref: (node) => {
+        fieldRefs.current[fieldName] = node;
+      },
+      "aria-invalid": hasError ? "true" : undefined,
+      "aria-describedby": hasError ? `${FIELD_IDS[fieldName]}-error` : undefined,
+      className: hasError ? "is-invalid" : undefined,
+    };
   }
 
   return (
@@ -64,31 +114,39 @@ export function LoginPage() {
         <p>주문내역, 배송지, 찜한 상품을 안전하게 관리하세요.</p>
       </div>
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <label htmlFor="login-email">이메일</label>
-        <input
-          id="login-email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          value={form.email}
-          onChange={handleChange}
-        />
-
-        <label htmlFor="login-password">비밀번호</label>
-        <input
-          id="login-password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          value={form.password}
-          onChange={handleChange}
-        />
-
-        {error && (
-          <p className="form-error" role="alert">
-            {error}
-          </p>
+        {serverError && (
+          <div className="auth-form__server-error" role="alert">
+            {serverError}
+          </div>
         )}
+
+        <div className="form-field">
+          <label htmlFor="login-email">이메일</label>
+          <input
+            id="login-email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            value={form.email}
+            onChange={handleChange}
+            {...getInputProps("email")}
+          />
+          {renderFieldError("email")}
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="login-password">비밀번호</label>
+          <input
+            id="login-password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            value={form.password}
+            onChange={handleChange}
+            {...getInputProps("password")}
+          />
+          {renderFieldError("password")}
+        </div>
 
         <button type="submit" className="btn btn--primary" disabled={submitting}>
           {submitting && <span className="btn__spinner" aria-hidden="true" />}

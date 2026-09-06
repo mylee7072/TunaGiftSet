@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { siteConfig } from "../../config/siteConfig";
-import { categoryApi } from "../../api/productApi";
+import { fetchProductCategories } from "../../data/products";
 import { useAuth } from "../../context/useAuth";
 import { useDismissibleOverlay } from "../../hooks/useDismissibleOverlay";
 import { cartApi } from "../../api/cartApi";
@@ -50,8 +50,7 @@ export function Header() {
 
   useEffect(() => {
     let cancelled = false;
-    categoryApi
-      .findActiveCategories()
+    fetchProductCategories()
       .then((data) => {
         if (!cancelled) setCategories(Array.isArray(data) ? data : []);
       })

@@ -1,26 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ApiError } from "../api/apiClient";
-import { brandApi, categoryApi, productApi } from "../api/productApi";
-import { wishlistApi } from "../api/wishlistApi";
+import { fetchProductBrands, fetchProductCategories, fetchProductPage } from "../data/products";
 import { EmptyState } from "../components/common/EmptyState";
 import { ErrorState } from "../components/common/ErrorState";
 import { Loading } from "../components/common/Loading";
 import { Pagination } from "../components/common/Pagination";
 import { ProductCard } from "../components/product/ProductCard";
 import { siteConfig } from "../config/siteConfig";
-import { useAuth } from "../context/useAuth";
 
 const PAGE_SIZE = 12;
 
 export function ProductListPage() {
-  const { isAuthenticated } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [keywordInput, setKeywordInput] = useState(searchParams.get("keyword") || "");
   const [products, setProducts] = useState(null);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
-  const [wishlistedProductIds, setWishlistedProductIds] = useState(() => new Set());
   const [status, setStatus] = useState("loading");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -44,7 +39,7 @@ export function ProductListPage() {
     setErrorMessage("");
     try {
       const [productPage, categoryList, brandList] = await Promise.all([
-        productApi.findProducts({
+        fetchProductPage({
           keyword,
           categoryId,
           brandId,
@@ -52,28 +47,20 @@ export function ProductListPage() {
           page: Number.isFinite(page) ? page : 0,
           size: PAGE_SIZE,
         }),
-        categoryApi.findActiveCategories().catch(() => []),
-        brandApi.findActiveBrands().catch(() => []),
+        fetchProductCategories().catch(() => []),
+        fetchProductBrands().catch(() => []),
       ]);
 
       setProducts(productPage);
       setCategories(Array.isArray(categoryList) ? categoryList : []);
       setBrands(Array.isArray(brandList) ? brandList : []);
       setStatus("ready");
-
-      const productIds = productPage?.content?.map((product) => product.id).filter(Boolean) || [];
-      if (isAuthenticated && productIds.length > 0) {
-        const wishlistResponse = await wishlistApi.findWishlistedProductIds(productIds).catch(() => null);
-        setWishlistedProductIds(new Set(wishlistResponse?.productIds || []));
-      } else {
-        setWishlistedProductIds(new Set());
-      }
-    } catch (error) {
+    } catch {
       setStatus("error");
       setProducts(null);
-      setErrorMessage(error instanceof ApiError ? error.message : "상품 정보를 불러오지 못했습니다.");
+      setErrorMessage("상품 정보를 불러오지 못했습니다.");
     }
-  }, [brandId, categoryId, isAuthenticated, keyword, page, sort]);
+  }, [brandId, categoryId, keyword, page, sort]);
 
   useEffect(() => {
     document.title = keyword ? `'${keyword}' 검색 결과 - ${siteConfig.siteName}` : `전체 상품 - ${siteConfig.siteName}`;
@@ -218,8 +205,6 @@ export function ProductListPage() {
               <ProductCard
                 key={product.id}
                 product={product}
-                enableWishlist
-                initialWishlisted={wishlistedProductIds.has(product.id)}
               />
             ))}
           </div>

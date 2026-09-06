@@ -1,136 +1,207 @@
-// Static storefront product catalog for the current testing phase. The storefront
-// pages (HomePage/ProductListPage/ProductDetailPage) read from this file directly
-// instead of the backend product API, which doesn't yet model composition/box-unit/
-// barcode fields. Everything lives in this one module so swapping it for real API
-// calls later only means changing the functions below, not every page that uses them.
-//
-// Product images aren't uploaded yet — until then every product resolves to
-// PLACEHOLDER_IMAGE. Drop a real file at `frontend/public/images/products/{id}.jpg`
-// (see imagePath below) and it starts rendering automatically, no code change needed.
 export const PLACEHOLDER_IMAGE = "/placeholder-product.svg";
 
 export const PRODUCTS = [
   {
     id: 1,
-    name: "동원 튜나리챔 11호",
+    productCode: "GIFT-TUNA-001",
+    name: "프리미엄 참치 선물세트 1호",
+    brandId: 1,
+    brandDisplayName: "세영기프트",
     categoryId: "tuna-richam",
-    brandName: "동원",
-    price: 139000,
-    originalPrice: null,
-    badge: null,
-    barcode: "",
-    boxUnit: "2세트/BOX",
-    composition: [
-      { name: "라이트스탠다드참치", weight: "135g", count: 12 },
-      { name: "고추참치", weight: "90g", count: 8 },
-      { name: "리챔더블라이트", weight: "200g", count: 4 },
-    ],
-    note: "재활용 플라스틱 고정재를 사용한 에코 패키지",
+    categoryName: "튜나리챔 세트",
+    thumbnailImageUrl: "/images/products/1.jpg",
+    originalPrice: 52000,
+    salePrice: 46800,
+    stockQuantity: 18,
+    status: "ACTIVE",
+    featured: true,
+    averageRating: 0,
+    reviewCount: 0,
+    wishlistCount: 0,
+    shortDescription: "참치와 리챔을 함께 담은 실속형 명절 선물 구성입니다.",
     description:
-      "정성껏 고른 참치와 리챔 구성으로 명절 선물, 기업 답례, 가족 선물까지 두루 어울리는 선물세트입니다.",
-    imagePath: "/images/products/1.jpg",
+      "부담 없는 가격대와 익숙한 구성으로 명절 선물, 거래처 답례, 가족 선물에 두루 어울리는 선물세트입니다.",
   },
   {
     id: 2,
-    name: "동원 튜나리챔 10호",
+    productCode: "GIFT-TUNA-002",
+    name: "실속 튜나리챔 선물세트 2호",
+    brandId: 1,
+    brandDisplayName: "세영기프트",
     categoryId: "tuna-richam",
-    brandName: "동원",
-    price: 135000,
+    categoryName: "튜나리챔 세트",
+    thumbnailImageUrl: "/images/products/2.jpg",
     originalPrice: null,
-    badge: null,
-    barcode: "",
-    boxUnit: "3세트/BOX",
-    composition: [
-      { name: "라이트스탠다드참치", weight: "135g", count: 18 },
-      { name: "리챔 오리지널", weight: "200g", count: 2 },
-      { name: "리챔 오리지널", weight: "340g", count: 1 },
-    ],
-    note: "",
-    description: "실속 있게 구성한 참치와 리챔 세트로, 부담 없이 전할 수 있는 선물입니다.",
-    imagePath: "/images/products/2.jpg",
+    salePrice: 39800,
+    stockQuantity: 24,
+    status: "ACTIVE",
+    featured: false,
+    averageRating: 0,
+    reviewCount: 0,
+    wishlistCount: 0,
+    shortDescription: "여러 곳에 나누어 선물하기 좋은 기본형 구성입니다.",
+    description:
+      "참치캔과 리챔을 균형 있게 구성해 일상에서 활용도가 높은 상품입니다. 단체 선물이나 가족 선물로 선택하기 좋습니다.",
   },
   {
     id: 3,
-    name: "동원 튜나리챔 30호",
-    categoryId: "tuna-richam",
-    brandName: "동원",
-    price: 37940,
-    originalPrice: 54200,
-    badge: "BEST",
-    barcode: "8801047865728",
-    boxUnit: "5세트/BOX",
-    composition: [
-      { name: "살코기참치", weight: "90g", count: 12 },
-      { name: "리챔더블라이트", weight: "120g", count: 3 },
-    ],
-    note: "",
-    description: "가장 많이 찾는 구성으로, 합리적인 가격에 준비한 베스트 선물세트입니다.",
-    imagePath: "/images/products/3.jpg",
+    productCode: "GIFT-SPECIAL-003",
+    name: "참치 리챔 혼합 선물세트 3호",
+    brandId: 1,
+    brandDisplayName: "세영기프트",
+    categoryId: "special",
+    categoryName: "스페셜 세트",
+    thumbnailImageUrl: "/images/products/3.jpg",
+    originalPrice: 68000,
+    salePrice: 57800,
+    stockQuantity: 12,
+    status: "ACTIVE",
+    featured: true,
+    averageRating: 0,
+    reviewCount: 0,
+    wishlistCount: 0,
+    shortDescription: "참치, 리챔, 식용유를 함께 담은 풍성한 혼합 구성입니다.",
+    description:
+      "선물 받는 분의 활용도를 고려해 다양한 식품을 함께 담았습니다. 정갈한 패키지로 명절과 감사 선물에 어울립니다.",
   },
   {
     id: 4,
-    name: "동원 스페셜 10호",
+    productCode: "GIFT-SPECIAL-004",
+    name: "스페셜 감사 선물세트 4호",
+    brandId: 1,
+    brandDisplayName: "세영기프트",
     categoryId: "special",
-    brandName: "동원",
-    price: 29880,
+    categoryName: "스페셜 세트",
+    thumbnailImageUrl: "/images/products/4.jpg",
     originalPrice: null,
-    badge: null,
-    barcode: "",
-    boxUnit: "",
-    composition: [
-      { name: "살코기참치", weight: "90g", count: 6 },
-      { name: "리챔", weight: "120g", count: 2 },
-      { name: "카놀라유", weight: "480ml", count: 2 },
-    ],
-    note: "",
-    description: "참치와 리챔, 식용유를 함께 담아 실용성을 높인 스페셜 구성입니다.",
-    imagePath: "/images/products/4.jpg",
+    salePrice: 32900,
+    stockQuantity: 0,
+    status: "SOLD_OUT",
+    featured: false,
+    averageRating: 0,
+    reviewCount: 0,
+    wishlistCount: 0,
+    shortDescription: "가벼운 감사 인사에 알맞은 소형 선물세트입니다.",
+    description:
+      "부담 없는 구성으로 지인, 동료, 이웃에게 마음을 전하기 좋은 상품입니다. 현재는 준비된 수량이 모두 소진되었습니다.",
   },
   {
     id: 5,
-    name: "동원 스페셜 39호",
-    categoryId: "special",
-    brandName: "동원",
-    price: 43960,
-    originalPrice: 62800,
-    badge: null,
-    barcode: "8801047865964",
-    boxUnit: "",
-    composition: [
-      { name: "살코기참치", weight: "135g", count: 6 },
-      { name: "리챔", weight: "120g", count: 4 },
-      { name: "리챔", weight: "200g", count: 2 },
-      { name: "리챔", weight: "340g", count: 1 },
-      { name: "건강요리유", weight: "480ml", count: 2 },
-    ],
-    note: "",
-    description: "참치와 리챔을 다양한 용량으로 구성하고 건강요리유를 더한 프리미엄 스페셜 세트입니다.",
-    imagePath: "/images/products/5.jpg",
+    productCode: "GIFT-TUNA-005",
+    name: "프리미엄 명절 선물세트 5호",
+    brandId: 1,
+    brandDisplayName: "세영기프트",
+    categoryId: "tuna-richam",
+    categoryName: "튜나리챔 세트",
+    thumbnailImageUrl: "/images/products/5.jpg",
+    originalPrice: 89000,
+    salePrice: 75600,
+    stockQuantity: 9,
+    status: "ACTIVE",
+    featured: true,
+    averageRating: 0,
+    reviewCount: 0,
+    wishlistCount: 0,
+    shortDescription: "조금 더 격식을 갖춘 선물이 필요할 때 선택하기 좋은 구성입니다.",
+    description:
+      "가격대와 구성이 안정적인 프리미엄 선물세트입니다. 가족 선물은 물론 기업 답례품으로도 사용하기 좋습니다.",
   },
 ];
 
-export function findProductById(id) {
-  return PRODUCTS.find((product) => String(product.id) === String(id)) || null;
-}
+export const PRODUCT_CATEGORIES = [
+  { id: "tuna-richam", name: "튜나리챔 세트", description: "참치와 리챔 중심의 실속 선물세트" },
+  { id: "special", name: "스페셜 세트", description: "참치, 리챔, 식용유 등을 함께 담은 혼합 구성" },
+];
 
-export function findProducts({ categoryId, keyword } = {}) {
-  const normalizedKeyword = keyword?.trim().toLowerCase();
-  return PRODUCTS.filter((product) => {
-    if (categoryId && product.categoryId !== categoryId) return false;
-    if (normalizedKeyword && !product.name.toLowerCase().includes(normalizedKeyword)) return false;
-    return true;
-  });
+export const PRODUCT_BRANDS = [
+  { id: 1, name: "seyoung-gift", displayName: "세영기프트" },
+];
+
+function normalizeText(value) {
+  return String(value || "").trim().toLowerCase();
 }
 
 export function computeDiscountRate(product) {
   const original = Number(product.originalPrice);
-  const price = Number(product.price);
-  if (!original || original <= 0 || !Number.isFinite(price) || price >= original) {
+  const sale = Number(product.salePrice);
+  if (!original || original <= 0 || !Number.isFinite(sale) || sale >= original) {
     return 0;
   }
-  return Math.floor(((original - price) / original) * 100);
+  return Math.floor(((original - sale) / original) * 100);
+}
+
+function toProductResponse(product) {
+  return {
+    ...product,
+    price: product.salePrice,
+    discountRate: computeDiscountRate(product),
+    soldOut: product.status === "SOLD_OUT" || product.stockQuantity === 0,
+    images: [
+      {
+        id: `${product.id}-main`,
+        imageUrl: product.thumbnailImageUrl || PLACEHOLDER_IMAGE,
+        imageType: "MAIN",
+        displayOrder: 0,
+      },
+    ],
+  };
+}
+
+export async function fetchProductPage({ categoryId, brandId, featured, keyword, sort = "LATEST", page = 0, size = 12 } = {}) {
+  const normalizedKeyword = normalizeText(keyword);
+  let items = PRODUCTS.map(toProductResponse).filter((product) => {
+    if (categoryId && String(product.categoryId) !== String(categoryId)) return false;
+    if (brandId && String(product.brandId) !== String(brandId)) return false;
+    if (featured !== undefined && featured !== "" && product.featured !== (featured === true || featured === "true")) return false;
+    if (normalizedKeyword) {
+      const searchable = normalizeText(`${product.name} ${product.shortDescription} ${product.categoryName} ${product.brandDisplayName}`);
+      if (!searchable.includes(normalizedKeyword)) return false;
+    }
+    return true;
+  });
+
+  if (sort === "PRICE_ASC") {
+    items = [...items].sort((a, b) => Number(a.salePrice) - Number(b.salePrice));
+  } else if (sort === "PRICE_DESC") {
+    items = [...items].sort((a, b) => Number(b.salePrice) - Number(a.salePrice));
+  } else {
+    items = [...items].sort((a, b) => Number(b.id) - Number(a.id));
+  }
+
+  const safePage = Math.max(0, Number(page) || 0);
+  const safeSize = Math.max(1, Number(size) || 12);
+  const start = safePage * safeSize;
+  const content = items.slice(start, start + safeSize);
+  const totalPages = Math.max(1, Math.ceil(items.length / safeSize));
+
+  return {
+    content,
+    page: safePage,
+    size: safeSize,
+    totalElements: items.length,
+    totalPages,
+    first: safePage === 0,
+    last: safePage >= totalPages - 1,
+  };
+}
+
+export async function fetchProductById(productId) {
+  const product = PRODUCTS.find((item) => String(item.id) === String(productId));
+  return product ? toProductResponse(product) : null;
+}
+
+export async function fetchProductCategories() {
+  return PRODUCT_CATEGORIES;
+}
+
+export async function fetchProductBrands() {
+  return PRODUCT_BRANDS;
+}
+
+export function findCategoryById(categoryId) {
+  return PRODUCT_CATEGORIES.find((category) => String(category.id) === String(categoryId)) || null;
 }
 
 export function getProductImageUrl(product) {
-  return product.imagePath || PLACEHOLDER_IMAGE;
+  return product?.thumbnailImageUrl || product?.images?.[0]?.imageUrl || PLACEHOLDER_IMAGE;
 }
