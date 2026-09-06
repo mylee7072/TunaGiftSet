@@ -8,6 +8,7 @@ import { ConfirmDialog } from "../components/common/ConfirmDialog";
 import { EmptyState } from "../components/common/EmptyState";
 import { ErrorState } from "../components/common/ErrorState";
 import { Loading } from "../components/common/Loading";
+import { StarRatingInput } from "../components/common/StarRatingInput";
 import { WishlistButton } from "../components/product/WishlistButton";
 import { useAuth } from "../context/useAuth";
 import { useToast } from "../context/useToast";
@@ -37,6 +38,7 @@ export function ProductDetailPage() {
   const [questionForm, setQuestionForm] = useState(QUESTION_FORM);
   const [communityError, setCommunityError] = useState("");
   const [pendingDelete, setPendingDelete] = useState(null);
+  const [expandedQuestionIds, setExpandedQuestionIds] = useState(() => new Set());
 
   const loadCommunity = useCallback(() => {
     reviewApi.findProductReviews(productId).then(setReviews).catch(() => setReviews({ content: [] }));
@@ -194,6 +196,18 @@ export function ProductDetailPage() {
     requireLoginThenRun(() => setPendingDelete({ type: "question", id: questionId }));
   }
 
+  function toggleQuestionExpanded(questionId) {
+    setExpandedQuestionIds((current) => {
+      const next = new Set(current);
+      if (next.has(questionId)) {
+        next.delete(questionId);
+      } else {
+        next.add(questionId);
+      }
+      return next;
+    });
+  }
+
   return (
     <div className="container section product-detail-page">
       <p className="breadcrumb">홈 / {product.categoryName || "상품"} / 상품상세</p>
@@ -333,9 +347,11 @@ export function ProductDetailPage() {
           <label htmlFor="reviewOrderItemId">주문상품 번호</label>
           <input id="reviewOrderItemId" value={reviewForm.orderItemId} onChange={(event) => setReviewForm((current) => ({ ...current, orderItemId: event.target.value }))} />
           <label htmlFor="reviewRating">평점</label>
-          <select id="reviewRating" value={reviewForm.rating} onChange={(event) => setReviewForm((current) => ({ ...current, rating: event.target.value }))}>
-            {[5, 4, 3, 2, 1].map((rating) => <option key={rating} value={rating}>{rating}점</option>)}
-          </select>
+          <StarRatingInput
+            id="reviewRating"
+            value={reviewForm.rating}
+            onChange={(rating) => setReviewForm((current) => ({ ...current, rating }))}
+          />
           <label htmlFor="reviewContent">내용</label>
           <textarea id="reviewContent" value={reviewForm.content} onChange={(event) => setReviewForm((current) => ({ ...current, content: event.target.value }))} minLength={10} maxLength={2000} />
           <button type="submit" className="btn btn--primary">리뷰 등록</button>
@@ -351,20 +367,39 @@ export function ProductDetailPage() {
         </div>
         {questions?.content?.length > 0 ? (
           <ul className="community-list">
-            {questions.content.map((question) => (
-              <li key={question.id} className="community-item">
-                <div className="community-item__header">
-                  <strong>{question.secret ? "비밀글" : "공개글"} · {question.status === "ANSWERED" ? "답변완료" : "답변대기"}</strong>
-                  <span>{question.authorName} · {formatDateTime(question.createdAt)}</span>
-                </div>
-                <h3>{question.title}</h3>
-                {question.content ? <p>{question.content}</p> : <p className="muted">비밀글입니다.</p>}
-                {question.answer && <div className="question-answer"><strong>판매자 답변</strong><p>{question.answer.content}</p></div>}
-                {question.editable && (
-                  <button type="button" className="link-button" onClick={() => handleQuestionDelete(question.id)}>삭제</button>
-                )}
-              </li>
-            ))}
+            {questions.content.map((question) => {
+              const expanded = expandedQuestionIds.has(question.id);
+              const panelId = `question-panel-${question.id}`;
+              return (
+                <li key={question.id} className="community-item">
+                  <button
+                    type="button"
+                    className="community-item__toggle"
+                    aria-expanded={expanded}
+                    aria-controls={panelId}
+                    onClick={() => toggleQuestionExpanded(question.id)}
+                  >
+                    <span>
+                      <div className="community-item__header">
+                        <strong>{question.secret ? "비밀글" : "공개글"} · {question.status === "ANSWERED" ? "답변완료" : "답변대기"}</strong>
+                        <span>{question.authorName} · {formatDateTime(question.createdAt)}</span>
+                      </div>
+                      <h3>{question.title}</h3>
+                    </span>
+                    <span className="community-item__toggle-icon" aria-hidden="true">▾</span>
+                  </button>
+                  <div id={panelId} className={`community-item__collapsible${expanded ? " is-expanded" : ""}`}>
+                    <div className="community-item__collapsible-inner">
+                      {question.content ? <p>{question.content}</p> : <p className="muted">비밀글입니다.</p>}
+                      {question.answer && <div className="question-answer"><strong>판매자 답변</strong><p>{question.answer.content}</p></div>}
+                      {question.editable && (
+                        <button type="button" className="link-button" onClick={() => handleQuestionDelete(question.id)}>삭제</button>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <EmptyState message="등록된 상품문의가 없습니다." />

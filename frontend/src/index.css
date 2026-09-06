@@ -82,6 +82,13 @@ body {
   margin: 0;
 }
 
+html {
+  /* Applies to the #product-info/#product-reviews/#product-questions anchor jumps
+   * from .detail-tabs — overridden back to instant under prefers-reduced-motion
+   * (see the global media query above). */
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: var(--font-sans);
   color: var(--color-text);
@@ -1125,6 +1132,76 @@ textarea {
   background: var(--color-surface-alt);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+}
+
+.star-rating-input {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.star-rating-input__star {
+  background: none;
+  border: none;
+  padding: 2px;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--color-border);
+  transition: transform var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard);
+}
+
+.star-rating-input__star.is-filled {
+  color: #e0a83e;
+}
+
+.star-rating-input__star:hover {
+  transform: scale(1.12);
+}
+
+.star-rating-input__value {
+  margin-left: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* Collapsible Q&A item — see .community-item--question in ProductDetailPage.jsx.
+ * The 0fr -> 1fr grid-template-rows trick animates height without JS measuring
+ * the content, and without the jankiness of animating `height: auto` directly. */
+.community-item__collapsible {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--motion-normal) var(--ease-standard);
+}
+
+.community-item__collapsible.is-expanded {
+  grid-template-rows: 1fr;
+}
+
+.community-item__collapsible-inner {
+  overflow: hidden;
+}
+
+.community-item__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+}
+
+.community-item__toggle-icon {
+  flex-shrink: 0;
+  transition: transform var(--motion-fast) var(--ease-standard);
+  color: var(--color-text-muted);
+}
+
+.community-item__toggle[aria-expanded="true"] .community-item__toggle-icon {
+  transform: rotate(180deg);
 }
 
 /* ---------- Quantity selector ---------- */
@@ -3034,6 +3111,9 @@ textarea {
 .product-detail__description {
   margin-top: 32px;
   padding: 24px;
+  /* Keeps the target section's own heading clear of the sticky .site-header +
+   * sticky .detail-tabs bar when jumping here via a #product-reviews-style anchor. */
+  scroll-margin-top: 190px;
 }
 
 .community-list {
