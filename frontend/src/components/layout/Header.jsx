@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { siteConfig } from "../../config/siteConfig";
-import { PRODUCT_CATEGORIES } from "../../data/categories";
+import { categoryApi } from "../../api/productApi";
 import { useAuth } from "../../context/useAuth";
 import { useDismissibleOverlay } from "../../hooks/useDismissibleOverlay";
 import { cartApi } from "../../api/cartApi";
@@ -15,6 +15,7 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const [categories, setCategories] = useState([]);
   const { shouldRender: drawerMounted, closing: drawerClosing } = useDismissibleOverlay(menuOpen, () => setMenuOpen(false));
 
   useEffect(() => {
@@ -45,6 +46,21 @@ export function Header() {
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    categoryApi
+      .findActiveCategories()
+      .then((data) => {
+        if (!cancelled) setCategories(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (!cancelled) setCategories([]);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   function handleSearchSubmit(event) {
@@ -148,31 +164,33 @@ export function Header() {
       {drawerMounted && <div className={`nav-backdrop${drawerClosing ? " nav-backdrop--closing" : ""}`} onClick={() => setMenuOpen(false)} />}
 
       <nav className={`site-header__gnb${menuOpen ? " site-header__gnb--open" : ""}`} aria-label="카테고리" {...navInert}>
-        <NavLink to="/products" onClick={() => setMenuOpen(false)} className={({ isActive }) => (isActive && !searchParams.get("categoryId") ? "is-active" : "")}>
-          전체상품
-        </NavLink>
-        <CategoryLinks activeCategoryId={searchParams.get("categoryId")} onNavigate={() => setMenuOpen(false)} />
-        {!isAuthenticated && (
-          <div className="site-header__gnb-auth">
-            <Link to="/login" onClick={() => setMenuOpen(false)}>
-              로그인
-            </Link>
-            <Link to="/signup" onClick={() => setMenuOpen(false)}>
-              회원가입
-            </Link>
-          </div>
-        )}
+        <div className="container site-header__gnb-inner">
+          <NavLink to="/products" onClick={() => setMenuOpen(false)} className={({ isActive }) => (isActive && !searchParams.get("categoryId") ? "is-active" : "")}>
+            전체상품
+          </NavLink>
+          <CategoryLinks categories={categories} activeCategoryId={searchParams.get("categoryId")} onNavigate={() => setMenuOpen(false)} />
+          {!isAuthenticated && (
+            <div className="site-header__gnb-auth">
+              <Link to="/login" onClick={() => setMenuOpen(false)}>
+                로그인
+              </Link>
+              <Link to="/signup" onClick={() => setMenuOpen(false)}>
+                회원가입
+              </Link>
+            </div>
+          )}
+        </div>
       </nav>
     </header>
   );
 }
 
-function CategoryLinks({ activeCategoryId, onNavigate }) {
-  return PRODUCT_CATEGORIES.map((category) => (
+function CategoryLinks({ categories, activeCategoryId, onNavigate }) {
+  return categories.map((category) => (
     <Link
       key={category.id}
       to={`/products?categoryId=${category.id}`}
-      className={activeCategoryId === category.id ? "is-active" : ""}
+      className={String(activeCategoryId) === String(category.id) ? "is-active" : ""}
       onClick={onNavigate}
     >
       {category.name}

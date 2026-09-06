@@ -1,27 +1,91 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { PRODUCT_CATEGORIES } from "../data/categories";
-import { findProducts } from "../data/products";
-import { StaticProductCard } from "../components/product/StaticProductCard";
+import { ApiError } from "../api/apiClient";
+import { brandApi, categoryApi, productApi } from "../api/productApi";
+import { wishlistApi } from "../api/wishlistApi";
 import { EmptyState } from "../components/common/EmptyState";
+import { ErrorState } from "../components/common/ErrorState";
+import { Loading } from "../components/common/Loading";
+import { Pagination } from "../components/common/Pagination";
+import { ProductCard } from "../components/product/ProductCard";
+import { siteConfig } from "../config/siteConfig";
+import { useAuth } from "../context/useAuth";
+
+const PAGE_SIZE = 12;
 
 export function ProductListPage() {
+  const { isAuthenticated } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [keywordInput, setKeywordInput] = useState(searchParams.get("keyword") || "");
+  const [products, setProducts] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [wishlistedProductIds, setWishlistedProductIds] = useState(() => new Set());
+  const [status, setStatus] = useState("loading");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const keyword = searchParams.get("keyword") || "";
   const categoryId = searchParams.get("categoryId") || "";
+  const brandId = searchParams.get("brandId") || "";
+  const sort = searchParams.get("sort") || "LATEST";
+  const page = Number(searchParams.get("page") || 0);
+
+  const selectedCategory = useMemo(
+    () => categories.find((category) => String(category.id) === String(categoryId)),
+    [categories, categoryId]
+  );
+  const selectedBrand = useMemo(
+    () => brands.find((brand) => String(brand.id) === String(brandId)),
+    [brands, brandId]
+  );
+
+  const loadProducts = useCallback(async () => {
+    setStatus("loading");
+    setErrorMessage("");
+    try {
+      const [productPage, categoryList, brandList] = await Promise.all([
+        productApi.findProducts({
+          keyword,
+          categoryId,
+          brandId,
+          sort,
+          page: Number.isFinite(page) ? page : 0,
+          size: PAGE_SIZE,
+        }),
+        categoryApi.findActiveCategories().catch(() => []),
+        brandApi.findActiveBrands().catch(() => []),
+      ]);
+
+      setProducts(productPage);
+      setCategories(Array.isArray(categoryList) ? categoryList : []);
+      setBrands(Array.isArray(brandList) ? brandList : []);
+      setStatus("ready");
+
+      const productIds = productPage?.content?.map((product) => product.id).filter(Boolean) || [];
+      if (isAuthenticated && productIds.length > 0) {
+        const wishlistResponse = await wishlistApi.findWishlistedProductIds(productIds).catch(() => null);
+        setWishlistedProductIds(new Set(wishlistResponse?.productIds || []));
+      } else {
+        setWishlistedProductIds(new Set());
+      }
+    } catch (error) {
+      setStatus("error");
+      setProducts(null);
+      setErrorMessage(error instanceof ApiError ? error.message : "상품 정보를 불러오지 못했습니다.");
+    }
+  }, [brandId, categoryId, isAuthenticated, keyword, page, sort]);
 
   useEffect(() => {
-    document.title = keyword ? `'${keyword}' 검색 결과 - SeyoungGiftSet` : "전체 상품 - SeyoungGiftSet";
+    document.title = keyword ? `'${keyword}' 검색 결과 - ${siteConfig.siteName}` : `전체 상품 - ${siteConfig.siteName}`;
   }, [keyword]);
 
   useEffect(() => {
     setKeywordInput(keyword);
   }, [keyword]);
 
-  const selectedCategory = PRODUCT_CATEGORIES.find((category) => category.id === categoryId);
-  const products = findProducts({ categoryId: categoryId || undefined, keyword: keyword || undefined });
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
 
   function updateParams(next) {
     const params = new URLSearchParams(searchParams);
@@ -32,6 +96,9 @@ export function ProductListPage() {
         params.set(key, value);
       }
     });
+    if (!Object.prototype.hasOwnProperty.call(next, "page")) {
+      params.delete("page");
+    }
     setSearchParams(params);
   }
 
@@ -45,13 +112,15 @@ export function ProductListPage() {
     setSearchParams({});
   }
 
+  const content = products?.content || [];
+
   return (
     <div className="container section product-list-page">
       <div className="product-list-page__header">
         <p className="breadcrumb">홈 / 상품</p>
         <h1 className="page-title">{keyword ? `'${keyword}' 검색 결과` : "전체 상품"}</h1>
         <p className="section__description">
-          {selectedCategory ? selectedCategory.description : "구성과 가격을 비교해 필요한 선물세트를 골라보세요."}
+          {selectedCategory ? selectedCategory.description || `${selectedCategory.name} 상품입니다.` : "구성과 가격을 비교해 필요한 선물세트를 골라보세요."}
         </p>
       </div>
 
@@ -73,35 +142,48 @@ export function ProductListPage() {
         </button>
       </form>
 
-      <div className="category-tabs" role="tablist" aria-label="카테고리">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={!categoryId}
-          className={`category-tabs__item${!categoryId ? " is-active" : ""}`}
-          onClick={() => updateParams({ categoryId: undefined })}
-        >
-          전체
-        </button>
-        {PRODUCT_CATEGORIES.map((category) => (
-          <button
-            key={category.id}
-            type="button"
-            role="tab"
-            aria-selected={categoryId === category.id}
-            className={`category-tabs__item${categoryId === category.id ? " is-active" : ""}`}
-            onClick={() => updateParams({ categoryId: category.id })}
-          >
-            {category.name}
-          </button>
-        ))}
+      <div className="product-list-page__toolbar">
+        <div className="product-list-page__filters">
+          <label>
+            카테고리
+            <select value={categoryId} onChange={(event) => updateParams({ categoryId: event.target.value })}>
+              <option value="">전체상품</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            브랜드
+            <select value={brandId} onChange={(event) => updateParams({ brandId: event.target.value })}>
+              <option value="">전체 브랜드</option>
+              {brands.map((brand) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.displayName || brand.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <label className="product-list-page__sort">
+          정렬
+          <select value={sort} onChange={(event) => updateParams({ sort: event.target.value })}>
+            <option value="LATEST">최신순</option>
+            <option value="PRICE_ASC">낮은 가격순</option>
+            <option value="PRICE_DESC">높은 가격순</option>
+          </select>
+        </label>
       </div>
 
-      {(keyword || categoryId) && (
+      {(keyword || categoryId || brandId || sort !== "LATEST") && (
         <div className="filter-summary" aria-label="적용된 필터">
           <div>
             {keyword && <span className="filter-chip">검색어: {keyword}</span>}
             {selectedCategory && <span className="filter-chip">카테고리: {selectedCategory.name}</span>}
+            {selectedBrand && <span className="filter-chip">브랜드: {selectedBrand.displayName || selectedBrand.name}</span>}
+            {sort !== "LATEST" && <span className="filter-chip">정렬: {sort === "PRICE_ASC" ? "낮은 가격순" : "높은 가격순"}</span>}
           </div>
           <button type="button" className="link-button" onClick={resetFilters}>
             필터 초기화
@@ -109,25 +191,39 @@ export function ProductListPage() {
         </div>
       )}
 
-      {products.length === 0 ? (
+      {status === "loading" && !products && <Loading label="상품을 불러오는 중입니다..." />}
+
+      {status === "error" && (
+        <ErrorState message={errorMessage || "상품 정보를 불러오지 못했습니다."} onRetry={loadProducts} />
+      )}
+
+      {status === "ready" && content.length === 0 && (
         <EmptyState
           message="검색 결과가 없습니다."
           action={
-            keyword || categoryId ? (
+            keyword || categoryId || brandId ? (
               <button type="button" className="btn btn--secondary" onClick={resetFilters}>
                 전체 상품 보기
               </button>
             ) : null
           }
         />
-      ) : (
+      )}
+
+      {status === "ready" && content.length > 0 && (
         <>
-          <p className="product-list-page__count">총 {products.length}개 상품</p>
+          <p className="product-list-page__count">총 {products.totalElements}개 상품</p>
           <div className="product-grid">
-            {products.map((product) => (
-              <StaticProductCard key={product.id} product={product} />
+            {content.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                enableWishlist
+                initialWishlisted={wishlistedProductIds.has(product.id)}
+              />
             ))}
           </div>
+          <Pagination page={products.page} totalPages={products.totalPages} onPageChange={(nextPage) => updateParams({ page: nextPage })} />
         </>
       )}
     </div>
