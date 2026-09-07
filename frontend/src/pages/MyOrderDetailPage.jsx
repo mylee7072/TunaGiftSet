@@ -16,6 +16,7 @@ import {
   isCancelableOrderStatus,
 } from "../utils/format";
 import { ApiError } from "../api/apiClient";
+import { buildTrackingUrl } from "../utils/delivery";
 
 export function MyOrderDetailPage() {
   const { orderNumber } = useParams();
@@ -64,6 +65,8 @@ export function MyOrderDetailPage() {
       </div>
     );
   }
+
+  const trackingUrl = buildTrackingUrl(order.delivery?.carrier, order.delivery?.trackingNumber);
 
   const shippingAddress = {
     zipCode: order.zipCode,
@@ -139,7 +142,26 @@ export function MyOrderDetailPage() {
           {order.delivery?.trackingNumber && (
             <div>
               <dt>택배사 / 송장번호</dt>
-              <dd>{order.delivery.carrier} / {order.delivery.trackingNumber}</dd>
+              <dd>
+                {order.delivery.carrier} / {order.delivery.trackingNumber}
+                {trackingUrl && (
+                  <a href={trackingUrl} target="_blank" rel="noopener noreferrer" className="tracking-link">
+                    배송조회
+                  </a>
+                )}
+              </dd>
+            </div>
+          )}
+          {order.delivery?.shippedAt && (
+            <div>
+              <dt>발송일</dt>
+              <dd>{formatDateTime(order.delivery.shippedAt)}</dd>
+            </div>
+          )}
+          {order.delivery?.deliveredAt && (
+            <div>
+              <dt>배송완료일</dt>
+              <dd>{formatDateTime(order.delivery.deliveredAt)}</dd>
             </div>
           )}
         </dl>

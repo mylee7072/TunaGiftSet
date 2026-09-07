@@ -41,6 +41,13 @@ export function AuthProvider({ children }) {
 
   const signup = useCallback((payload) => authApi.signup(payload), []);
 
+  const oauthLogin = useCallback(async (provider, code, redirectUri) => {
+    const response = await authApi.oauthLogin(provider, { code, redirectUri });
+    setStoredToken(response.accessToken);
+    setMember(response.member);
+    return response.member;
+  }, []);
+
   // Stateless JWT: there is no server-side session to invalidate, so "logout" is
   // discarding the local token. This matches the current backend's auth model —
   // it does not expose a logout endpoint (see AuthController).
@@ -55,9 +62,10 @@ export function AuthProvider({ children }) {
       isLoading,
       login,
       signup,
+      oauthLogin,
       logout,
     }),
-    [member, isLoading, login, signup, logout]
+    [member, isLoading, login, signup, oauthLogin, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

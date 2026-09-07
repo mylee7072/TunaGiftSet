@@ -8,6 +8,7 @@ import {
   validateLoginField,
   validateLoginForm,
 } from "../utils/authValidation";
+import { isOAuthProviderConfigured, startOAuthLogin } from "../utils/oauth";
 
 const FIELD_IDS = {
   email: "login-email",
@@ -37,6 +38,12 @@ export function LoginPage() {
   useEffect(() => {
     document.title = "로그인 - SeyoungGiftSet";
   }, []);
+
+  useEffect(() => {
+    if (location.state?.oauthError) {
+      setServerError(location.state.oauthError);
+    }
+  }, [location.state]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -153,6 +160,23 @@ export function LoginPage() {
           {submitting ? "로그인 중..." : "로그인"}
         </button>
       </form>
+
+      {(isOAuthProviderConfigured("kakao") || isOAuthProviderConfigured("google")) && (
+        <div className="auth-page__oauth">
+          <p className="auth-page__oauth-divider">또는</p>
+          {isOAuthProviderConfigured("kakao") && (
+            <button type="button" className="btn btn--block btn--kakao" onClick={() => startOAuthLogin("kakao")}>
+              카카오로 로그인
+            </button>
+          )}
+          {isOAuthProviderConfigured("google") && (
+            <button type="button" className="btn btn--block btn--google" onClick={() => startOAuthLogin("google")}>
+              구글로 로그인
+            </button>
+          )}
+        </div>
+      )}
+
       <p className="auth-page__footer">
         아직 회원이 아니신가요? <Link to="/signup">회원가입</Link>
       </p>

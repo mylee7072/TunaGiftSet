@@ -555,6 +555,49 @@ textarea {
   right: 0;
 }
 
+.site-header__theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.site-header__theme-toggle-track {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+  transition: background var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard);
+}
+
+.site-header__theme-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard);
+}
+
+.site-header__theme-toggle[aria-pressed="true"] .site-header__theme-toggle-track {
+  border-color: var(--color-primary-dark);
+  background: var(--color-primary);
+}
+
+.site-header__theme-toggle[aria-pressed="true"] .site-header__theme-toggle-thumb {
+  transform: translateX(20px);
+  background: var(--color-on-primary);
+}
+
 .site-header__cart {
   position: relative;
   font-weight: 600;
@@ -1178,11 +1221,6 @@ textarea {
 }
 
 /* ---------- Forms ---------- */
-.auth-page {
-  max-width: 420px;
-  padding: 40px 20px;
-}
-
 .auth-form,
 .order-form,
 .order-form__section,
@@ -1257,6 +1295,41 @@ textarea {
   margin-top: var(--space-4);
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+}
+
+.auth-page__oauth {
+  grid-column: 2;
+  margin-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.auth-page__oauth-divider {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin: 0 0 var(--space-2);
+}
+
+/* Kakao's own brand yellow — not a design-system token since no other UI element uses it. */
+.btn--kakao {
+  background: #fee500;
+  color: #191600;
+}
+
+.btn--kakao:hover:not(:disabled) {
+  background: #fada0a;
+}
+
+.btn--google {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.btn--google:hover:not(:disabled) {
+  background: var(--color-surface-alt);
 }
 
 .form-error {
@@ -1668,6 +1741,12 @@ textarea {
 
 .order-detail-page__actions {
   text-align: right;
+}
+
+.tracking-link {
+  margin-left: var(--space-2);
+  color: var(--color-primary);
+  text-decoration: underline;
 }
 
 /* ---------- Payment result / order complete ---------- */
@@ -3612,7 +3691,8 @@ textarea {
   }
 
   .auth-page__intro,
-  .auth-page__footer {
+  .auth-page__footer,
+  .auth-page__oauth {
     grid-column: 1;
     padding-top: 0;
     margin: 0;

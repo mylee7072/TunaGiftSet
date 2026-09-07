@@ -51,7 +51,7 @@ public class SecurityConfig {
                         // Only the health group is exposed at all (see management.endpoints.web.exposure.include);
                         // it must be reachable without a JWT so the Docker/Compose healthcheck can call it directly.
                         .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/signup", "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/signup", "/api/auth/login", "/api/auth/oauth/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**", "/api/brands/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/questions/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()

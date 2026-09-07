@@ -20,6 +20,13 @@ COPY . .
 ARG VITE_TOSS_CLIENT_KEY=""
 ENV VITE_TOSS_CLIENT_KEY=$VITE_TOSS_CLIENT_KEY
 
+# Kakao/Google OAuth client IDs — public values, safe to bake in. Empty by default,
+# which leaves that social-login button hidden (see src/utils/oauth.js).
+ARG VITE_KAKAO_CLIENT_ID=""
+ENV VITE_KAKAO_CLIENT_ID=$VITE_KAKAO_CLIENT_ID
+ARG VITE_GOOGLE_CLIENT_ID=""
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+
 RUN npm run build
 
 # ---------------------------------------------------------------------------

@@ -15,6 +15,7 @@ const ProductListPage = lazy(() => import("./pages/ProductListPage").then((m) =>
 const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage").then((m) => ({ default: m.ProductDetailPage })));
 const LoginPage = lazy(() => import("./pages/LoginPage").then((m) => ({ default: m.LoginPage })));
 const SignupPage = lazy(() => import("./pages/SignupPage").then((m) => ({ default: m.SignupPage })));
+const OAuthCallbackPage = lazy(() => import("./pages/OAuthCallbackPage").then((m) => ({ default: m.OAuthCallbackPage })));
 const CartPage = lazy(() => import("./pages/CartPage").then((m) => ({ default: m.CartPage })));
 const OrderFormPage = lazy(() => import("./pages/OrderFormPage").then((m) => ({ default: m.OrderFormPage })));
 const OrderCompletePage = lazy(() => import("./pages/OrderCompletePage").then((m) => ({ default: m.OrderCompletePage })));
@@ -64,6 +65,7 @@ export default function App() {
               <Route path="products/:productId" element={<ProductDetailPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="signup" element={<SignupPage />} />
+              <Route path="auth/:provider/callback" element={<OAuthCallbackPage />} />
               <Route path="payment/success" element={<PaymentSuccessPage />} />
               <Route path="payment/fail" element={<PaymentFailPage />} />
               <Route path="company" element={<CompanyInfoPage />} />
