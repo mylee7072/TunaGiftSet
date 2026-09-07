@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { m, useReducedMotion } from "motion/react";
 import { ApiError } from "../../api/apiClient";
 import { wishlistApi } from "../../api/wishlistApi";
 import { useAuth } from "../../context/useAuth";
@@ -17,6 +18,7 @@ export function WishlistButton({
   const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const shouldReduceMotion = useReducedMotion();
   const [wishlisted, setWishlisted] = useState(initialWishlisted);
   const [wishlistCount, setWishlistCount] = useState(Number(initialCount || 0));
   const [submitting, setSubmitting] = useState(false);
@@ -63,7 +65,7 @@ export function WishlistButton({
   }
 
   return (
-    <button
+    <m.button
       type="button"
       className={`wishlist-button${wishlisted ? " wishlist-button--active" : ""}${pulse ? " wishlist-button--pulse" : ""}${showText ? " wishlist-button--with-text" : ""}${className ? ` ${className}` : ""}`}
       onClick={handleClick}
@@ -71,10 +73,12 @@ export function WishlistButton({
       disabled={submitting}
       aria-label={wishlisted ? "찜 취소" : "찜하기"}
       aria-pressed={wishlisted}
+      whileTap={shouldReduceMotion ? undefined : { scale: 0.8 }}
+      transition={{ type: "spring", stiffness: 500, damping: 15 }}
     >
       <span aria-hidden="true" className="wishlist-button__icon">{wishlisted ? "♥" : "♡"}</span>
       {showText && <span className="wishlist-button__label">{wishlisted ? "찜 취소" : "찜하기"}</span>}
       {wishlistCount > 0 && <span className="wishlist-button__count">{wishlistCount}</span>}
-    </button>
+    </m.button>
   );
 }

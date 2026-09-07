@@ -7,6 +7,7 @@ import { EmptySearchIcon } from "../components/common/icons/StateIcons";
 import { Loading } from "../components/common/Loading";
 import { Pagination } from "../components/common/Pagination";
 import { ProductCard } from "../components/product/ProductCard";
+import { StaggerGrid } from "../components/common/StaggerGrid";
 import { siteConfig } from "../config/siteConfig";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 
@@ -206,14 +207,15 @@ export function ProductListPage() {
       {status === "ready" && content.length > 0 && (
         <>
           <p className="product-list-page__count">총 {products.totalElements}개 상품</p>
-          <div className="product-grid">
-            {content.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-              />
-            ))}
-          </div>
+          {/* Keyed by the full query string so a filter/sort/page change remounts
+           * the grid and replays the stagger for the new result set, instead of
+           * only ever playing once for the very first page load. */}
+          <StaggerGrid
+            key={searchParams.toString()}
+            items={content}
+            keyFor={(product) => product.id}
+            renderItem={(product) => <ProductCard product={product} />}
+          />
           <Pagination page={products.page} totalPages={products.totalPages} onPageChange={(nextPage) => updateParams({ page: nextPage })} />
         </>
       )}

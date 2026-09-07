@@ -425,20 +425,10 @@ textarea {
   flex: 1;
 }
 
-/* Remounted (via a key={pathname} on this element, see RootLayout.jsx) on every
- * genuine page change — a very small fade + lift so navigation reads as "the page
- * changed" without the jarring instant cut of no transition at all, and without a
- * disorienting large-scale slide. */
-.route-transition {
-  animation: route-fade-in var(--motion-slow) var(--ease-enter);
-}
-
-@keyframes route-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-}
+/* Route enter/exit fade+lift now lives in RootLayout.jsx (AnimatePresence +
+ * motion.div) instead of here — it needs an exit animation before unmount,
+ * which a CSS animation on mount can't do. See src/motion/tokens.js for the
+ * shared duration/ease constants. */
 
 /* ---------- Header ---------- */
 .site-header {

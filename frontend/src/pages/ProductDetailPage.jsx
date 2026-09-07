@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { LazyMotion, domMax, m, useReducedMotion } from "motion/react";
 import { ApiError } from "../api/apiClient";
 import { cartApi } from "../api/cartApi";
 import { questionApi, reviewApi } from "../api/communityApi";
@@ -14,6 +15,18 @@ import { useToast } from "../context/useToast";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 import { useProductJsonLd } from "../hooks/useProductJsonLd";
 import { formatDateTime, formatPrice } from "../utils/format";
+import { EASE_ENTER, MOTION_NORMAL } from "../motion/tokens";
+
+// A true shared-element transition from the list card's thumbnail (layoutId)
+// falls apart here: RootLayout's AnimatePresence runs in mode="wait", so the
+// list page has already fully exited — and unmounted — before this page's lazy
+// chunk even starts loading, let alone mounts its image. There's never a tick
+// where both elements coexist for motion to hand off between. A fade+scale
+// entrance on this image is the honest version of that idea instead.
+const heroImageMotion = {
+  initial: { opacity: 0, scale: 0.96 },
+  animate: { opacity: 1, scale: 1, transition: { duration: MOTION_NORMAL, ease: EASE_ENTER } },
+};
 
 const PLACEHOLDER_IMAGE = "/placeholder-product.svg";
 const MAX_QUANTITY = 99;
@@ -36,6 +49,8 @@ export function ProductDetailPage() {
   const [questionSubmitting, setQuestionSubmitting] = useState(false);
   const [questionForm, setQuestionForm] = useState({ title: "", content: "", secret: false });
   const imageDialogRef = useRef(null);
+  const didDragRef = useRef(false);
+  const shouldReduceMotion = useReducedMotion();
 
   const loadProduct = useCallback(async () => {
     setStatus("loading");
@@ -113,6 +128,29 @@ export function ProductDetailPage() {
     if (!isPurchasable) return;
     const next = Math.min(maxQuantity, Math.max(1, nextQuantity));
     setQuantity(next);
+  }
+
+  // A real drag past the threshold both switches the image and — since a
+  // pointerup after a drag still fires a native click — flags didDragRef so the
+  // click handler below can skip opening the zoom dialog for that same gesture.
+  function handleGalleryDragEnd(_event, info) {
+    if (images.length <= 1) return;
+    const draggedLeft = info.offset.x < -60 || info.velocity.x < -500;
+    const draggedRight = info.offset.x > 60 || info.velocity.x > 500;
+    if (!draggedLeft && !draggedRight) return;
+    didDragRef.current = true;
+    setSelectedImageIndex((current) => {
+      const next = draggedLeft ? current + 1 : current - 1;
+      return Math.min(images.length - 1, Math.max(0, next));
+    });
+  }
+
+  function handleGalleryClick() {
+    if (didDragRef.current) {
+      didDragRef.current = false;
+      return;
+    }
+    imageDialogRef.current?.showModal();
   }
 
   async function addToCart({ goToCart = false } = {}) {
@@ -193,6 +231,10 @@ export function ProductDetailPage() {
   }
 
   return (
+    // Scoped to this already-lazy-loaded route chunk: domMax (drag + layout,
+    // superset of the domAnimation RootLayout provides app-wide) only downloads
+    // when someone actually visits a product detail page — not on first paint.
+    <LazyMotion features={domMax} strict>
     <div className="container section product-detail-page">
       <nav className="breadcrumb product-detail-breadcrumb" aria-label="현재 위치">
         <Link to="/">홈</Link>
@@ -208,11 +250,16 @@ export function ProductDetailPage() {
 
       <section className="product-detail-hero" aria-labelledby="product-title">
         <div className="product-detail-gallery">
-          <button
+          <m.button
             type="button"
             className="product-detail-gallery__main"
-            onClick={() => imageDialogRef.current?.showModal()}
-            aria-label="상품 이미지 크게 보기"
+            onClick={handleGalleryClick}
+            aria-label="상품 이미지 크게 보기 (여러 장이면 좌우로 끌어서 전환)"
+            drag={images.length > 1 && !shouldReduceMotion ? "x" : false}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={handleGalleryDragEnd}
+            {...(shouldReduceMotion ? {} : heroImageMotion)}
           >
             <img
               src={selectedImage?.imageUrl || PLACEHOLDER_IMAGE}
@@ -222,7 +269,7 @@ export function ProductDetailPage() {
                 event.currentTarget.src = PLACEHOLDER_IMAGE;
               }}
             />
-          </button>
+          </m.button>
 
           {images.length > 1 && (
             <div className="product-detail-gallery__thumbs" role="list" aria-label="상품 이미지 선택">
@@ -332,10 +379,16 @@ export function ProductDetailPage() {
               className="product-detail-actions__wishlist"
               onChange={(response) => setWishlisted(response.wishlisted)}
             />
-            <button type="button" className="btn btn--secondary btn--large" onClick={() => addToCart()} disabled={!isPurchasable || cartSubmitting}>
+            <m.button
+              type="button"
+              className="btn btn--secondary btn--large"
+              onClick={() => addToCart()}
+              disabled={!isPurchasable || cartSubmitting}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
+            >
               {cartSubmitting && <span className="btn__spinner" aria-hidden="true" />}
               {cartSubmitting ? "담는 중..." : "장바구니"}
-            </button>
+            </m.button>
             <button type="button" className="btn btn--primary btn--large" onClick={handleBuyNow} disabled={!isPurchasable || cartSubmitting}>
               {cartSubmitting && <span className="btn__spinner" aria-hidden="true" />}
               구매하기
@@ -465,10 +518,16 @@ export function ProductDetailPage() {
 
       <div className="mobile-purchase-bar" aria-label="모바일 구매 바로가기">
         <WishlistButton productId={product.id} initialWishlisted={wishlisted} initialCount={product.wishlistCount} onChange={(response) => setWishlisted(response.wishlisted)} />
-        <button type="button" className="btn btn--secondary" onClick={() => addToCart()} disabled={!isPurchasable || cartSubmitting}>
+        <m.button
+          type="button"
+          className="btn btn--secondary"
+          onClick={() => addToCart()}
+          disabled={!isPurchasable || cartSubmitting}
+          whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
+        >
           {cartSubmitting && <span className="btn__spinner" aria-hidden="true" />}
           장바구니
-        </button>
+        </m.button>
         <button type="button" className="btn btn--primary" onClick={handleBuyNow} disabled={!isPurchasable || cartSubmitting}>
           {cartSubmitting && <span className="btn__spinner" aria-hidden="true" />}
           구매하기
@@ -482,6 +541,7 @@ export function ProductDetailPage() {
         <img src={selectedImage?.imageUrl || PLACEHOLDER_IMAGE} alt={product.name} />
       </dialog>
     </div>
+    </LazyMotion>
   );
 }
 

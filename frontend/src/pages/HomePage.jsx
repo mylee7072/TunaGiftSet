@@ -6,6 +6,7 @@ import { ErrorState } from "../components/common/ErrorState";
 import { Loading } from "../components/common/Loading";
 import { ProductCard } from "../components/product/ProductCard";
 import { Reveal } from "../components/common/Reveal";
+import { StaggerGrid } from "../components/common/StaggerGrid";
 import { siteConfig } from "../config/siteConfig";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 
@@ -106,11 +107,11 @@ export function HomePage() {
                 </div>
                 <Link to="/products?featured=true" className="section-header__link">전체보기</Link>
               </div>
-              <div className="product-grid">
-                {featuredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+              <StaggerGrid
+                items={featuredProducts}
+                keyFor={(product) => product.id}
+                renderItem={(product) => <ProductCard product={product} />}
+              />
             </Reveal>
           )}
 
@@ -123,11 +124,11 @@ export function HomePage() {
               <Link to="/products" className="section-header__link">전체보기</Link>
             </div>
             {latestProducts.length > 0 ? (
-              <div className="product-grid">
-                {latestProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+              <StaggerGrid
+                items={latestProducts}
+                keyFor={(product) => product.id}
+                renderItem={(product) => <ProductCard product={product} />}
+              />
             ) : (
               <EmptyState message="등록된 상품이 없습니다." action={<Link to="/products" className="btn btn--secondary">상품 목록으로</Link>} />
             )}
