@@ -25,17 +25,6 @@ export function Footer() {
           <Link to="/mypage/addresses">배송지 관리</Link>
         </nav>
 
-        <dl className="site-footer__info">
-          <div>
-            <dt>고객센터</dt>
-            <dd>{siteConfig.supportPhone}</dd>
-          </div>
-          <div>
-            <dt>운영시간</dt>
-            <dd>{siteConfig.supportHours}</dd>
-          </div>
-        </dl>
-
         <div className="site-footer__business">
           <button
             type="button"

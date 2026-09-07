@@ -2,13 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ApiError } from "../api/apiClient";
 import { cartApi } from "../api/cartApi";
-import { questionApi } from "../api/communityApi";
+import { questionApi, reviewApi } from "../api/communityApi";
 import { wishlistApi } from "../api/wishlistApi";
 import { EmptyState } from "../components/common/EmptyState";
 import { ErrorState } from "../components/common/ErrorState";
 import { WishlistButton } from "../components/product/WishlistButton";
 import { siteConfig } from "../config/siteConfig";
-import { fetchProductById } from "../data/products";
+import { productApi } from "../api/productApi";
 import { useAuth } from "../context/useAuth";
 import { useToast } from "../context/useToast";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
@@ -40,15 +40,19 @@ export function ProductDetailPage() {
   const loadProduct = useCallback(async () => {
     setStatus("loading");
     try {
-      const productData = await fetchProductById(productId);
+      const [productData, reviewsData, questionsData] = await Promise.all([
+        productApi.findProduct(productId),
+        reviewApi.findProductReviews(productId, { size: 10 }).catch(() => ({ content: [], totalElements: 0 })),
+        questionApi.findProductQuestions(productId, { size: 5 }).catch(() => ({ content: [], totalElements: 0 })),
+      ]);
       if (!productData) {
         setStatus("not-found");
         return;
       }
 
       setProduct(productData);
-      setReviews({ content: [], totalElements: 0 });
-      setQuestions({ content: [], totalElements: 0 });
+      setReviews(reviewsData);
+      setQuestions(questionsData);
       setSelectedImageIndex(0);
       setQuantity(1);
       setStatus("ready");

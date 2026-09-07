@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { fetchProductBrands, fetchProductCategories, fetchProductPage } from "../data/products";
+import { brandApi, categoryApi, productApi } from "../api/productApi";
 import { EmptyState } from "../components/common/EmptyState";
 import { ErrorState } from "../components/common/ErrorState";
 import { Loading } from "../components/common/Loading";
@@ -40,7 +40,7 @@ export function ProductListPage() {
     setErrorMessage("");
     try {
       const [productPage, categoryList, brandList] = await Promise.all([
-        fetchProductPage({
+        productApi.findProducts({
           keyword,
           categoryId,
           brandId,
@@ -48,12 +48,12 @@ export function ProductListPage() {
           page: Number.isFinite(page) ? page : 0,
           size: PAGE_SIZE,
         }),
-        fetchProductCategories().catch(() => []),
-        fetchProductBrands().catch(() => []),
+        categoryApi.findActiveCategories().catch(() => []),
+        brandApi.findActiveBrands().catch(() => []),
       ]);
 
       setProducts(productPage);
-      setCategories(Array.isArray(categoryList) ? categoryList : []);
+      setCategories(Array.isArray(categoryList) ? categoryList.filter((category) => !category.parentId) : []);
       setBrands(Array.isArray(brandList) ? brandList : []);
       setStatus("ready");
     } catch {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchProductCategories, fetchProductPage } from "../data/products";
+import { categoryApi, productApi } from "../api/productApi";
 import { EmptyState } from "../components/common/EmptyState";
 import { ErrorState } from "../components/common/ErrorState";
 import { Loading } from "../components/common/Loading";
@@ -28,11 +28,11 @@ export function HomePage() {
     setStatus("loading");
     try {
       const [categoryList, featuredPage, latestPage] = await Promise.all([
-        fetchProductCategories().catch(() => []),
-        fetchProductPage({ featured: true, page: 0, size: 4 }).catch(() => ({ content: [] })),
-        fetchProductPage({ sort: "LATEST", page: 0, size: 8 }),
+        categoryApi.findActiveCategories().catch(() => []),
+        productApi.findProducts({ featured: true, page: 0, size: 4 }).catch(() => ({ content: [] })),
+        productApi.findProducts({ sort: "LATEST", page: 0, size: 8 }),
       ]);
-      setCategories(Array.isArray(categoryList) ? categoryList : []);
+      setCategories(Array.isArray(categoryList) ? categoryList.filter((category) => !category.parentId) : []);
       setFeaturedProducts(featuredPage.content || []);
       setLatestProducts(latestPage.content || []);
       setStatus("ready");

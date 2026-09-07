@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { siteConfig } from "../../config/siteConfig";
-import { fetchProductCategories } from "../../data/products";
+import { categoryApi } from "../../api/productApi";
 import { useAuth } from "../../context/useAuth";
 import { useDismissibleOverlay } from "../../hooks/useDismissibleOverlay";
 import { cartApi } from "../../api/cartApi";
@@ -57,9 +57,10 @@ export function Header() {
 
   useEffect(() => {
     let cancelled = false;
-    fetchProductCategories()
+    categoryApi
+      .findActiveCategories()
       .then((data) => {
-        if (!cancelled) setCategories(Array.isArray(data) ? data : []);
+        if (!cancelled) setCategories(Array.isArray(data) ? data.filter((category) => !category.parentId) : []);
       })
       .catch(() => {
         if (!cancelled) setCategories([]);
@@ -99,7 +100,6 @@ export function Header() {
       <div className="site-header__utility">
         <div className="container site-header__utility-inner">
           <span>선물세트 전문 쇼핑몰</span>
-          <span>평일 10:00-17:00 고객지원</span>
         </div>
       </div>
 
