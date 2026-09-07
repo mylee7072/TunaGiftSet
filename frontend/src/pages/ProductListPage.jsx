@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { brandApi, categoryApi, productApi } from "../api/productApi";
 import { EmptyState } from "../components/common/EmptyState";
 import { ErrorState } from "../components/common/ErrorState";
+import { EmptySearchIcon } from "../components/common/icons/StateIcons";
 import { Loading } from "../components/common/Loading";
 import { Pagination } from "../components/common/Pagination";
 import { ProductCard } from "../components/product/ProductCard";
@@ -190,6 +191,7 @@ export function ProductListPage() {
 
       {status === "ready" && content.length === 0 && (
         <EmptyState
+          icon={EmptySearchIcon}
           message="검색 결과가 없습니다."
           action={
             keyword || categoryId || brandId ? (

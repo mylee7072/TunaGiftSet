@@ -18,6 +18,22 @@
    * 3.64:1, below WCAG AA's 4.5:1 for normal text. This value gets ~5.2:1. */
   --color-warning: #a15c00;
   --color-success: #2e7d32;
+  /* A step below --color-surface-alt — chip/pressed-state backgrounds
+   * (btn--secondary:active, badges, skeleton fills) that need to read as
+   * slightly more present than the page's default alt surface. */
+  --color-surface-muted: #f0f0f0;
+  /* Text/icon color for anything sitting on a filled primary/accent/danger/dark
+   * surface (button labels, badges, the always-dark admin sidebar). Deliberately
+   * NOT a --color-* alias of the light palette — it must stay white in both
+   * themes, since the surfaces it sits on stay dark in both themes too. */
+  --color-on-primary: #ffffff;
+  /* Deliberately theme-invariant near-black surface — the admin sidebar and the
+   * toast pill are designed as "always dark" chrome, not something that should
+   * flip to a light surface under dark mode (same value --color-text starts at,
+   * but --color-text itself flips, this must not). */
+  --color-ink: #18181b;
+  --color-primary-active: #0b0f19;
+  --color-overlay: rgba(0, 0, 0, 0.45);
 
   /* ---------- Spacing scale (4px unit) ----------
    * Reach for these instead of one-off px values — a new gap/padding should be
@@ -26,8 +42,11 @@
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
+  --space-5: 20px;
   --space-6: 24px;
+  --space-7: 28px;
   --space-8: 32px;
+  --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
 
@@ -62,6 +81,10 @@
   --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 14px 34px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 22px 48px rgba(0, 0, 0, 0.12);
+  /* The one directional exception to the three tiers above — an upward shadow
+   * for elements stuck to the *bottom* of the viewport (mobile purchase bar,
+   * sticky product actions), where a downward shadow would sit on the wrong side. */
+  --shadow-sticky-bottom: 0 -6px 20px rgba(15, 23, 42, 0.08);
 
   /* ---------- Layout ----------
    * Breakpoints (640/768/1024/1280) aren't tokens — custom properties can't be
@@ -97,6 +120,58 @@
 
   /* Back-compat alias — most of the stylesheet still writes --container-width. */
   --container-width: var(--container-max);
+}
+
+/* ---------- Dark mode ----------
+ * Token-only redefinition — every component rule in this file already reads
+ * color through a --color-* var, so flipping the vars here is enough to
+ * repaint the whole app. Never add component-specific selectors in this
+ * section; if something looks wrong in dark mode, the fix is a missing/wrong
+ * token upstream, not a rule here.
+ *
+ * Two ways in: an explicit user choice (ThemeToggle in Header.jsx sets
+ * data-theme on <html> and persists it to localStorage) or, with no explicit
+ * choice made yet, the OS-level prefers-color-scheme. [data-theme="dark"]
+ * matches first (source order) but light stays default unless one of these
+ * two paths opts in.
+ *
+ * --color-accent/--color-danger/--color-warning intentionally do NOT all
+ * change — a color's contrast against its own filled background (white text
+ * on a red/amber button or badge) doesn't depend on the page's theme, only
+ * --color-success and --color-warning get brighter dark variants below,
+ * because those two are also used as *text* paired with a translucent tint of
+ * the same var as its own background (e.g. admin-badge--active) — over a dark
+ * page surface that pairing goes low-contrast unless the var itself lightens. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #121214;
+    --color-surface: #1c1c1f;
+    --color-surface-alt: #232327;
+    --color-surface-muted: #2c2c31;
+    --color-border: #38383f;
+    --color-text: #f2f2f3;
+    --color-text-muted: #a3a3ab;
+    --color-primary: #4b5768;
+    --color-primary-dark: #5f6c7f;
+    --color-primary-active: #29323f;
+    --color-warning: #e2a336;
+    --color-success: #3fb950;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #121214;
+  --color-surface: #1c1c1f;
+  --color-surface-alt: #232327;
+  --color-surface-muted: #2c2c31;
+  --color-border: #38383f;
+  --color-text: #f2f2f3;
+  --color-text-muted: #a3a3ab;
+  --color-primary: #4b5768;
+  --color-primary-dark: #5f6c7f;
+  --color-primary-active: #29323f;
+  --color-warning: #e2a336;
+  --color-success: #3fb950;
 }
 
 * {
@@ -147,7 +222,7 @@
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-sm);
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   font-weight: 700;
   transition: top var(--motion-fast) var(--ease-standard);
 }
@@ -296,7 +371,7 @@ textarea {
 
 .btn--primary {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
 }
 
 .btn--primary:hover:not(:disabled) {
@@ -304,7 +379,7 @@ textarea {
 }
 
 .btn--primary:active:not(:disabled) {
-  background: #0b0f19;
+  background: var(--color-primary-active);
 }
 
 .btn--secondary {
@@ -319,12 +394,12 @@ textarea {
 }
 
 .btn--secondary:active:not(:disabled) {
-  background: #f0f0f0;
+  background: var(--color-surface-muted);
 }
 
 .btn--danger {
   background: var(--color-danger);
-  color: #fff;
+  color: var(--color-on-primary);
 }
 
 .btn--danger:hover:not(:disabled) {
@@ -380,13 +455,13 @@ textarea {
  * cause a layout shift the way resizing the header on scroll would. */
 .site-header--scrolled {
   border-bottom-color: var(--color-border);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 
 .site-header__top {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--space-5);
   padding: 14px 20px;
 }
 
@@ -449,7 +524,7 @@ textarea {
   padding: 8px 16px;
   border: 1px solid var(--color-primary);
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   transition: background var(--motion-fast) var(--ease-standard);
 }
@@ -500,7 +575,7 @@ textarea {
   top: -8px;
   right: -14px;
   background: var(--color-accent);
-  color: #fff;
+  color: var(--color-on-primary);
   font-size: 0.7rem;
   border-radius: 999px;
   padding: 1px 6px;
@@ -516,7 +591,7 @@ textarea {
 
 .site-header__gnb {
   display: flex;
-  gap: 20px;
+  gap: var(--space-5);
   padding: 10px 20px;
   border-top: 1px solid var(--color-border);
   font-size: 0.9rem;
@@ -543,7 +618,7 @@ textarea {
 .nav-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--color-overlay);
   z-index: var(--z-drawer-backdrop);
   animation: modal-backdrop-in var(--motion-normal) var(--ease-standard);
 }
@@ -709,7 +784,7 @@ textarea {
 .hero__inner {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: var(--space-10);
   padding: 48px 20px;
 }
 
@@ -819,14 +894,14 @@ textarea {
   overflow: hidden;
   /* box-shadow (not border-width) carries the hover emphasis, so the card never
    * changes size/position on hover — no layout shift, no jitter with neighbors. */
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  box-shadow: none;
   transition: box-shadow var(--motion-normal) var(--ease-standard), border-color var(--motion-normal) var(--ease-standard);
 }
 
 .product-card:hover,
 .product-card:focus-visible {
   border-color: var(--color-primary);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .product-card__image-wrap {
@@ -858,7 +933,7 @@ textarea {
   padding: 0 10px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.94);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
   color: var(--color-text-muted);
   font-size: 1.05rem;
   font-weight: 700;
@@ -867,7 +942,7 @@ textarea {
 
 .wishlist-button--active {
   color: var(--color-accent);
-  border-color: #e7b7b7;
+  border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
 }
 
 /* Triggered by WishlistButton.jsx for one animation cycle right after a
@@ -913,7 +988,7 @@ textarea {
   letter-spacing: 0.02em;
   padding: 3px var(--space-2);
   border-radius: var(--radius-sm);
-  color: #fff;
+  color: var(--color-on-primary);
 }
 
 .product-card__image-wrap .badge {
@@ -923,7 +998,7 @@ textarea {
 }
 
 .badge--soldout {
-  background: #737373;
+  background: var(--color-text-muted);
 }
 
 /* Gold, not the navy point color — reads as an editorial "worth noting" pick
@@ -1010,6 +1085,16 @@ textarea {
   color: var(--color-danger);
 }
 
+.state-block__icon {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.state-block--error .state-block__icon {
+  color: var(--color-danger);
+  opacity: 0.85;
+}
+
 .spinner {
   width: 28px;
   height: 28px;
@@ -1075,7 +1160,7 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin-top: 28px;
+  margin-top: var(--space-7);
   flex-wrap: wrap;
 }
 
@@ -1098,7 +1183,7 @@ textarea {
 
 .pagination__page--active {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   border-color: var(--color-primary);
 }
 
@@ -1166,7 +1251,7 @@ textarea {
  * still unambiguous at a glance, just not shouting. */
 .auth-form input.is-invalid {
   border-color: var(--color-danger);
-  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 10%, transparent);
 }
 
 .auth-form input.is-invalid:focus {
@@ -1199,9 +1284,9 @@ textarea {
 
 .auth-form__server-error {
   padding: var(--space-3) var(--space-4);
-  border: 1px solid rgba(192, 57, 43, 0.22);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 22%, transparent);
   border-radius: var(--radius-sm);
-  background: rgba(192, 57, 43, 0.05);
+  background: color-mix(in srgb, var(--color-danger) 5%, transparent);
   color: var(--color-danger);
   font-size: var(--font-size-sm);
   line-height: 1.45;
@@ -1379,7 +1464,7 @@ textarea {
 
 .cart-summary {
   margin-top: 24px;
-  padding: 20px;
+  padding: var(--space-5);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -1434,7 +1519,7 @@ textarea {
 }
 
 .order-summary {
-  margin-top: 20px;
+  margin-top: var(--space-5);
   padding: 16px 20px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -1491,7 +1576,7 @@ textarea {
   width: fit-content;
   padding: 2px 7px;
   border-radius: var(--radius-sm);
-  background: #f5f5f5;
+  background: var(--color-surface-muted);
   color: var(--color-primary-dark);
   font-style: normal;
   font-size: 0.75rem;
@@ -1534,7 +1619,7 @@ textarea {
 .order-list__link:hover,
 .order-list__link:focus-visible {
   border-color: var(--color-primary);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
 .order-list__header {
@@ -1652,7 +1737,7 @@ textarea {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 20px;
+  padding: var(--space-5);
   margin-bottom: 24px;
 }
 
@@ -1787,7 +1872,7 @@ textarea {
 .product-list-page__filters {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
   flex-wrap: wrap;
 }
 
@@ -1820,12 +1905,12 @@ textarea {
 
 .toast {
   pointer-events: auto;
-  background: #18181b;
-  color: #fff;
+  background: var(--color-ink);
+  color: var(--color-on-primary);
   padding: 12px 20px;
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
   animation: toast-in var(--motion-normal) var(--ease-enter);
 }
 
@@ -1857,12 +1942,12 @@ textarea {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--color-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: var(--z-modal-backdrop);
-  padding: 20px;
+  padding: var(--space-5);
   animation: modal-backdrop-in var(--motion-normal) var(--ease-standard);
 }
 
@@ -1923,7 +2008,7 @@ textarea {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 20px;
+  margin-top: var(--space-5);
 }
 
 /* ---------- Coupon select modal ---------- */
@@ -1983,14 +2068,14 @@ textarea {
 }
 
 .coupon-select-modal__unusable {
-  color: var(--color-danger, #c0392b);
+  color: var(--color-danger);
 }
 
 /* ---------- Coupon wallet page ---------- */
 .coupon-wallet-page__tabs {
   display: flex;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -2076,7 +2161,7 @@ textarea {
 
 .admin-sidebar {
   background: var(--color-text);
-  color: #fff;
+  color: var(--color-on-primary);
   padding: 20px 0;
   display: flex;
   flex-direction: column;
@@ -2088,7 +2173,7 @@ textarea {
 .admin-sidebar__brand {
   font-weight: 700;
   padding: 0 20px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-on-primary) 15%, transparent);
   margin-bottom: 12px;
 }
 
@@ -2100,27 +2185,27 @@ textarea {
 
 .admin-sidebar__link {
   padding: 12px 20px;
-  color: rgba(255, 255, 255, 0.75);
+  color: color-mix(in srgb, var(--color-on-primary) 75%, transparent);
   font-size: 0.92rem;
   transition: color var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard);
 }
 
 .admin-sidebar__link:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-on-primary);
+  background: color-mix(in srgb, var(--color-on-primary) 8%, transparent);
 }
 
 .admin-sidebar__link.is-active {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.15);
+  color: var(--color-on-primary);
+  background: color-mix(in srgb, var(--color-on-primary) 15%, transparent);
   font-weight: 600;
 }
 
 .admin-sidebar__exit {
   padding: 12px 20px;
-  color: rgba(255, 255, 255, 0.6);
+  color: color-mix(in srgb, var(--color-on-primary) 60%, transparent);
   font-size: 0.85rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid color-mix(in srgb, var(--color-on-primary) 15%, transparent);
 }
 
 .admin-main {
@@ -2151,7 +2236,7 @@ textarea {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 20px;
+  padding: var(--space-5);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -2183,7 +2268,7 @@ textarea {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
 }
 
 .admin-filter-bar--wrap {
@@ -2270,7 +2355,7 @@ textarea {
 }
 
 .admin-badge--active {
-  background: rgba(46, 125, 50, 0.12);
+  background: color-mix(in srgb, var(--color-success) 12%, transparent);
   color: var(--color-success);
 }
 
@@ -2279,7 +2364,7 @@ textarea {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 20px;
+  padding: var(--space-5);
   margin-bottom: 24px;
 }
 
@@ -2465,7 +2550,7 @@ textarea {
     margin: 16px -20px 0;
     padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--color-border);
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sticky-bottom);
   }
 
   .site-header__menu-toggle {
@@ -2491,7 +2576,7 @@ textarea {
     width: min(82vw, 320px);
     background: var(--color-surface);
     border-top: none;
-    padding: 20px;
+    padding: var(--space-5);
     overflow-y: auto;
     z-index: var(--z-drawer);
     transform: translateX(100%);
@@ -2635,7 +2720,7 @@ textarea {
 }
 
 .section-header {
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
 }
 
 .section-header h2,
@@ -2676,13 +2761,13 @@ textarea {
 }
 
 .site-header {
-  background: rgba(255, 255, 255, 0.96);
-  border-bottom: 1px solid rgba(229, 229, 229, 0.85);
+  background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
   backdrop-filter: blur(10px);
 }
 
 .site-header__utility {
-  border-bottom: 1px solid rgba(229, 229, 229, 0.65);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 65%, transparent);
   color: var(--color-text-muted);
   font-size: 0.82rem;
 }
@@ -2770,21 +2855,21 @@ textarea {
 .site-header__gnb {
   display: block;
   padding: 0;
-  background: #ffffff;
+  background: var(--color-surface);
   overflow: visible;
 }
 
 .site-header__gnb-inner {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--space-5);
   overflow-x: auto;
 }
 
 .site-header__gnb a {
   flex: 0 0 auto;
   padding: 13px 4px;
-  color: #3f3f46;
+  color: var(--color-text);
   font-weight: 650;
 }
 
@@ -2799,8 +2884,8 @@ textarea {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(circle at 78% 24%, rgba(192, 57, 43, 0.07), transparent 30%),
-    linear-gradient(135deg, #f7f7f7 0%, #f2f2f2 100%);
+    radial-gradient(circle at 78% 24%, color-mix(in srgb, var(--color-accent) 7%, transparent), transparent 30%),
+    linear-gradient(135deg, var(--color-surface-alt) 0%, var(--color-surface-muted) 100%);
   box-shadow: var(--shadow-sm);
 }
 
@@ -2876,7 +2961,7 @@ textarea {
 }
 
 .category-quick-menu__item:hover {
-  border-color: rgba(31, 41, 55, 0.45);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   transform: translateY(-2px);
 }
 
@@ -2887,7 +2972,7 @@ textarea {
   height: 38px;
   place-items: center;
   border-radius: 8px;
-  background: #eeeeee;
+  background: var(--color-surface-muted);
   color: var(--color-primary-dark);
   font-weight: 800;
 }
@@ -2907,7 +2992,7 @@ textarea {
  * neighboring cards never reflow. */
 .product-card:hover,
 .product-card:focus-visible {
-  border-color: rgba(31, 41, 55, 0.45);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--shadow-md);
   transform: translateY(-3px);
 }
@@ -2977,7 +3062,7 @@ textarea {
   align-items: center;
   padding: 1px var(--space-2);
   border-radius: var(--radius-sm);
-  background: rgba(192, 57, 43, 0.1);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
   color: var(--color-accent);
   font-size: var(--font-size-xs);
   font-weight: 800;
@@ -2990,16 +3075,16 @@ textarea {
   gap: 4px;
   min-width: 36px;
   min-height: 36px;
-  border: 1px solid rgba(31, 41, 55, 0.18);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 18%, transparent);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
-  color: #525252;
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  color: var(--color-text-muted);
 }
 
 .wishlist-button--active {
   color: var(--color-accent);
-  border-color: rgba(192, 57, 43, 0.35);
-  background: #fafafa;
+  border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  background: var(--color-surface-alt);
 }
 
 .wishlist-button__icon {
@@ -3045,7 +3130,7 @@ textarea {
   padding: 12px 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: #fafafa;
+  background: var(--color-surface-alt);
 }
 
 .filter-summary > div {
@@ -3059,10 +3144,10 @@ textarea {
   align-items: center;
   min-height: 28px;
   padding: 4px 9px;
-  border: 1px solid rgba(31, 41, 55, 0.18);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 18%, transparent);
   border-radius: 999px;
-  background: #fff;
-  color: #404040;
+  background: var(--color-surface);
+  color: var(--color-text);
   font-size: 0.84rem;
 }
 
@@ -3116,11 +3201,11 @@ textarea {
   z-index: 5;
   display: flex;
   gap: 6px;
-  margin-top: 28px;
+  margin-top: var(--space-7);
   padding: 8px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.96);
+  background: color-mix(in srgb, var(--color-surface) 96%, transparent);
   backdrop-filter: blur(8px);
 }
 
@@ -3182,7 +3267,7 @@ textarea {
 .cart-item__image {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: #fafafa;
+  background: var(--color-surface-alt);
   object-fit: contain;
 }
 
@@ -3207,7 +3292,7 @@ textarea {
 .order-form-page {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 .checkout-progress {
@@ -3233,8 +3318,8 @@ textarea {
 }
 
 .checkout-progress strong {
-  border-color: rgba(31, 41, 55, 0.4);
-  background: #eeeeee;
+  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  background: var(--color-surface-muted);
   color: var(--color-primary-dark);
 }
 
@@ -3273,7 +3358,7 @@ textarea {
 
 .order-address-option.is-selected {
   border-color: var(--color-primary);
-  background: #f7f7f7;
+  background: var(--color-surface-alt);
 }
 
 .order-form-page__coupon-selected {
@@ -3284,7 +3369,7 @@ textarea {
   margin: 0;
   padding: 12px 14px;
   border-radius: var(--radius-md);
-  background: #f7f7f7;
+  background: var(--color-surface-alt);
 }
 
 .order-form-page__coupon-selected p {
@@ -3370,7 +3455,7 @@ textarea {
 
 .coupon-wallet-page__tab.is-active {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
 }
 
 .coupon-card {
@@ -3403,8 +3488,8 @@ textarea {
 }
 
 .order-timeline span.is-current {
-  border-color: rgba(31, 41, 55, 0.42);
-  background: #eeeeee;
+  border-color: color-mix(in srgb, var(--color-primary) 42%, transparent);
+  background: var(--color-surface-muted);
   color: var(--color-primary-dark);
 }
 
@@ -3467,7 +3552,7 @@ textarea {
   }
 
   .site-header__actions a:not(.site-header__cart),
-  .site-header__actions .link-button {
+  .site-header__actions .link-button:not(.site-header__theme-toggle) {
     display: none;
   }
 
@@ -3533,7 +3618,7 @@ textarea {
   .auth-page {
     grid-template-columns: 1fr;
     gap: 18px;
-    padding-top: 28px;
+    padding-top: var(--space-7);
   }
 
   .auth-page__intro,
@@ -3608,9 +3693,9 @@ textarea {
 .product-detail-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.04fr) minmax(360px, 0.96fr);
-  gap: 40px;
+  gap: var(--space-10);
   align-items: start;
-  padding: 28px;
+  padding: var(--space-7);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
@@ -3629,7 +3714,7 @@ textarea {
   padding: 26px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: linear-gradient(180deg, #fff, #fafafa);
+  background: linear-gradient(180deg, var(--color-surface), var(--color-surface-alt));
 }
 
 .product-detail-gallery__main img {
@@ -3654,7 +3739,7 @@ textarea {
   padding: 6px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  background: #fff;
+  background: var(--color-surface);
 }
 
 .product-detail-gallery__thumb img {
@@ -3812,7 +3897,7 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 20px;
+  margin-top: var(--space-5);
 }
 
 .product-detail-quantity > label {
@@ -3825,7 +3910,7 @@ textarea {
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 20px;
+  margin-top: var(--space-5);
   padding: 18px 0;
   border-top: 1px solid var(--color-border);
 }
@@ -3863,14 +3948,14 @@ textarea {
   margin: 14px 0 0;
   padding: 12px 14px;
   border-radius: var(--radius-md);
-  background: #fff7ed;
-  color: #9a3412;
+  background: color-mix(in srgb, var(--color-warning) 12%, transparent);
+  color: var(--color-warning);
   font-size: 0.9rem;
 }
 
 .product-detail-section {
-  margin-top: 28px;
-  padding: 28px;
+  margin-top: var(--space-7);
+  padding: var(--space-7);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
@@ -3891,7 +3976,7 @@ textarea {
 
 .product-detail-spec,
 .product-detail-policy {
-  margin-top: 28px;
+  margin-top: var(--space-7);
   padding-top: 24px;
   border-top: 1px solid var(--color-border);
 }
@@ -3983,7 +4068,7 @@ textarea {
   padding: 18px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: #fafafa;
+  background: var(--color-surface-alt);
 }
 
 .question-write-form__footer {
@@ -4005,7 +4090,7 @@ textarea {
   margin-top: 12px;
   padding: 14px;
   border-left: 3px solid var(--color-primary);
-  background: #fafafa;
+  background: var(--color-surface-alt);
 }
 
 .question-answer strong {
@@ -4023,12 +4108,12 @@ textarea {
   padding: 44px 20px 20px;
   border: 0;
   border-radius: var(--radius-md);
-  background: #fff;
+  background: var(--color-surface);
   box-shadow: var(--shadow-md);
 }
 
 .image-viewer::backdrop {
-  background: rgba(15, 23, 42, 0.58);
+  background: var(--color-overlay);
 }
 
 .image-viewer img {
@@ -4046,7 +4131,7 @@ textarea {
   place-items: center;
   border: 1px solid var(--color-border);
   border-radius: 50%;
-  background: #fff;
+  background: var(--color-surface);
   color: var(--color-text);
   font-size: 1.3rem;
 }
@@ -4054,8 +4139,8 @@ textarea {
 .product-detail-skeleton {
   display: grid;
   grid-template-columns: minmax(0, 1.04fr) minmax(360px, 0.96fr);
-  gap: 40px;
-  padding: 28px;
+  gap: var(--space-10);
+  padding: var(--space-7);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
@@ -4076,7 +4161,7 @@ textarea {
 .skeleton-line {
   position: relative;
   overflow: hidden;
-  background: #ededed;
+  background: var(--color-border);
 }
 
 .skeleton-line {
@@ -4102,7 +4187,7 @@ textarea {
 .skeleton-line--button {
   width: 100%;
   height: 52px;
-  margin-top: 20px;
+  margin-top: var(--space-5);
   border-radius: var(--radius-md);
 }
 
@@ -4177,8 +4262,8 @@ textarea {
     gap: 8px;
     padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--color-border);
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+    background: color-mix(in srgb, var(--color-surface) 98%, transparent);
+    box-shadow: var(--shadow-sticky-bottom);
   }
 
   .mobile-purchase-bar .wishlist-button {

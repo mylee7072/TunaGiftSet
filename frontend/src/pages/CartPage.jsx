@@ -5,6 +5,7 @@ import { useToast } from "../context/useToast";
 import { Loading } from "../components/common/Loading";
 import { EmptyState } from "../components/common/EmptyState";
 import { ErrorState } from "../components/common/ErrorState";
+import { EmptyCartIcon } from "../components/common/icons/StateIcons";
 import { ConfirmDialog } from "../components/common/ConfirmDialog";
 import { formatPrice } from "../utils/format";
 import { ApiError } from "../api/apiClient";
@@ -140,6 +141,7 @@ export function CartPage() {
       <div className="container section">
         <h1 className="page-title">장바구니</h1>
         <EmptyState
+          icon={EmptyCartIcon}
           message="장바구니가 비어 있습니다."
           action={
             <button type="button" className="btn btn--primary" onClick={() => navigate("/products")}>

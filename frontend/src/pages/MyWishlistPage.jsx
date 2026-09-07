@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { wishlistApi } from "../api/wishlistApi";
 import { EmptyState } from "../components/common/EmptyState";
 import { ErrorState } from "../components/common/ErrorState";
+import { EmptyWishlistIcon } from "../components/common/icons/StateIcons";
 import { ProductGridSkeleton } from "../components/common/Skeleton";
 import { Pagination } from "../components/common/Pagination";
 import { PageHeader } from "../components/common/PageHeader";
@@ -51,6 +52,7 @@ export function MyWishlistPage() {
       )}
       {status === "ready" && pageData.content.length === 0 && (
         <EmptyState
+          icon={EmptyWishlistIcon}
           message="찜한 상품이 없습니다."
           action={<Link to="/products" className="btn btn--primary">상품 둘러보기</Link>}
         />

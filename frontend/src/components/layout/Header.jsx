@@ -6,6 +6,12 @@ import { useAuth } from "../../context/useAuth";
 import { useDismissibleOverlay } from "../../hooks/useDismissibleOverlay";
 import { cartApi } from "../../api/cartApi";
 
+function getInitialTheme() {
+  const stored = localStorage.getItem("theme");
+  if (stored === "light" || stored === "dark") return stored;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
 export function Header() {
   const { isAuthenticated, member, logout } = useAuth();
   const navigate = useNavigate();
@@ -16,8 +22,14 @@ export function Header() {
   const [cartCount, setCartCount] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [theme, setTheme] = useState(getInitialTheme);
   const drawerRef = useRef(null);
   const { shouldRender: drawerMounted, closing: drawerClosing } = useDismissibleOverlay(menuOpen, () => setMenuOpen(false), drawerRef);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     if (menuOpen) {
@@ -139,6 +151,14 @@ export function Header() {
         </form>
 
         <nav className="site-header__actions" aria-label="사용자 메뉴">
+          <button
+            type="button"
+            className="link-button site-header__theme-toggle"
+            onClick={() => setTheme((current) => (current === "dark" ? "light" : "dark"))}
+            aria-label={theme === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환"}
+          >
+            {theme === "dark" ? "라이트 모드" : "다크 모드"}
+          </button>
           {isAuthenticated ? (
             <>
               {member?.role === "ADMIN" && <Link to="/admin">관리자</Link>}
